@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" type="text/css" href="styles_index.css">
+
+</head>
+<body>
+<header>
+  <h1>Аутентификация</h1>
+</header>
+
+<nav>
+  <a href="index.html">Главная</a>
+  <a href="about.html">О компании</a>
+  <a href="contact.html">Контакты</a>
+  <a href="catalog.html">Каталог</a>
+  <a href="registration.html">Регистрация</a>
+</nav>
+<form th:action="@{/login}" method="post">
+  <label for="username">Username:</label>
+  <input type="text" id="username" name="username" required>
+  <br>
+  <label for="password">Password:</label>
+  <input type="password" id="password" name="password" required>
+  <br>
+  <button type="submit">Login</button>
+  <p><a href="registration.html">Зарегистрироваться</a></p>
+</form>
+
+</body>
+</html>
