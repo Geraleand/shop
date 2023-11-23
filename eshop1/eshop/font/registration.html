@@ -46,33 +46,6 @@
             <a href="login.html">Back to Login</a>
     </form>
 
-
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script>
-        function register() {
-            const userData = {
-                login: $('#login').val(),
-                password: $('#password').val(),
-                surname: $('#surname').val(),
-                name: $('#name').val(),
-                birthday: $('#birthday').val(),
-                telephone: $('#telephone').val(),
-            };
-
-            $.ajax({
-                url: 'http://localhost:8080/register',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(userData),
-                success: function(response) {
-                    alert('Регистрация успешна: ' + response);
-                },
-                error: function(error) {
-                    alert('Ошибка регистрации: ' + error.responseText);
-                }
-            });
-        }
-    </script>
 </div>
 <div class="footer">
     <p>&copy; 2023 Интернет-магазин. Все права защищены. | <a href="#">Политика конфиденциальности</a></p>
