@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0
+      author: admin
+      changes:
+      - createTable:
+          tableName: authorities
+          columns:
+            - column:
+                name: id
+                type: bigint
+                autoIncrement: true
+                constraints:
+                  primaryKey: true
+                  nullable: false
+            - column:
+                name: username
+                type: varchar
+            - column:
+                name: authority
+                type: varchar
+
+  - changeSet:
+      id: insert_authorities_admin
+      author: admin
+      changes:
+        - insert:
+            tableName: authorities
+            columns:
+              - column:
+                  name: username
+                  value: admin
+              - column:
+                  name: authority
+                  value: ADMIN
