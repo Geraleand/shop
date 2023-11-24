@@ -24,7 +24,7 @@ function registerUser() {
     };
 
     // Отправляем данные на бэкенд
-    fetch('http://localhost/register', {
+    fetch('http://localhost:8080/register', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

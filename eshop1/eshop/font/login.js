@@ -2,37 +2,30 @@ function loginUser() {
     var username = document.getElementById("username").value;
     var password = document.getElementById("password").value;
 
-    // Создаем объект с данными пользователя
-    var userData = {
+    // Создаем объект с данными аутентификации
+    var authData = {
         username: username,
         password: password
     };
 
     // Отправляем данные на бэкенд
-    fetch('http://localhost/login', {
+    fetch('http://localhost:8080/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(userData)
+        body: JSON.stringify(authData)
     })
-        .then(response => response.json())
-        .then(data => {
-            // Вызываем функцию проверки с полученными данными
-            checkLogin(data);
+        .then(response => {
+            if (response.ok) {
+                // Если статус ответа 200, перенаправляем пользователя в личный кабинет
+                window.location.href = 'user_lk.html';
+            } else {
+                // Если есть ошибка, выводим сообщение об ошибке
+                alert('Неверное имя пользователя или пароль');
+            }
         })
         .catch(error => {
-            console.error('Ошибка при входе:', error);
+            console.error('Ошибка при аутентификации:', error);
         });
-}
-
-// Функция проверки входа
-function checkLogin(data) {
-    if (data.success) {
-        alert('Вход успешен');
-        // Переадресация в личный кабинет
-        window.location.href = 'user_lk.html';
-    } else {
-        alert('Неверное имя пользователя или пароль');
-    }
 }
