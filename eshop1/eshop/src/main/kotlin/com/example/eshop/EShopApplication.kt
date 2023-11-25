@@ -1,9 +1,11 @@
+package com.example.eshop
+
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class EshopApplication
+class EShopApplication
 
 fun main(args: Array<String>) {
-	runApplication<EshopApplication>(*args)
+	runApplication<EShopApplication>(*args)
 }
