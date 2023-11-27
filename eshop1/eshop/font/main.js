@@ -83,18 +83,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Функция для генерации случайного номера заказа
 function generateOrderNumber() {
-    return Math.floor(Math.random() * 1000000) + 1;
+    var lastOrderNumber = parseInt(localStorage.getItem("lastOrderNumber")) || 0;
+    var orderNumber = lastOrderNumber + 1;
+    localStorage.setItem("lastOrderNumber", orderNumber);
+    return orderNumber;
 }
 
 // Функция для обработки оформления заказа
 function checkout() {
     var cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    // Здесь вы можете добавить дополнительную логику обработки заказа,
-    // например, отправку данных на сервер и т.д.
+    // Отправка данных на сервер (замените URL на ваш)
+    var serverURL = "http://localhost:8080/basket";
+    var orderData = {
+        orderNumber: generateOrderNumber(),
+        items: cart
+    };
 
-    // Генерируем номер заказа
-    var orderNumber = generateOrderNumber();
+    // Замените это на реальный код отправки данных на сервер
+    fetch(serverURL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(orderData)
+    })
+        .then(response => response.json())
+        .then(data => {
+            // Обработка успешного ответа от сервера
+            console.log("Order submitted successfully:", data);
+            // Дополнительные действия по вашему выбору
+        })
+        .catch(error => {
+            // Обработка ошибки при отправке на сервер
+            console.error("Error submitting order:", error);
+            // Дополнительные действия по вашему выбору
+        });
 
     // Выводим номер заказа
     alert("Заказ успешно оформлен. Номер заказа: " + orderNumber);
@@ -114,6 +138,3 @@ function clearCart() {
     displayCartItems();
 }
 
-// Добавьте обработчик события для кнопки "Оформить заказ"
-var checkoutButton = document.getElementById("checkoutButton");
-checkoutButton.addEventListener("click", checkout);
