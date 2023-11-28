@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     updateTotalPrice();
 });
 
+
 function displayCartItems() {
     var cartItemsContainer = document.getElementById("cartItems");
     var cart = JSON.parse(localStorage.getItem("cart")) || [];

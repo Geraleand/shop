@@ -3,11 +3,13 @@ document.addEventListener("DOMContentLoaded", function() {
     var searchInput = document.getElementsByName("search")[0];
     var clearSearchButton = document.querySelector(".search-cancel");
 
-    // Добавляем обработчик события клика на кнопку отмены
-    clearSearchButton.addEventListener("click", function() {
-        // Очищаем значение поля ввода
-        searchInput.value = "";
-    });
+    if (clearSearchButton) {
+        // Добавляем обработчик события клика на кнопку отмены
+        clearSearchButton.addEventListener("click", function () {
+            // Очищаем значение поля ввода
+            searchInput.value = "";
+        });
+    }
 });
 
 function incrementQuantity(card) {
@@ -39,8 +41,11 @@ function addToCart(cardElement) {
         image: productImage
     };
 
+    var cart = []
     // Получение текущего содержимого корзины из localStorage
-    var cart = JSON.parse(localStorage.getItem("cart")) || [];
+    if (localStorage.getItem("cart") !== null && localStorage.getItem("cart") !== undefined) {
+        cart = JSON.parse(localStorage.getItem("cart"));
+    }
 
     // Проверка, есть ли уже такой товар в корзине
     var existingProduct = cart.find(item => item.name === productName);
@@ -76,65 +81,104 @@ document.addEventListener("DOMContentLoaded", function () {
             addToCart(button.closest(".card"));
         });
     });
-
     // Обновление количества товаров в иконке корзины при загрузке страницы
     updateCartIcon();
 });
 
-// Функция для генерации случайного номера заказа
+// Инициализация текущего номера заказа при загрузке страницы
+var currentOrderNumber = parseInt(localStorage.getItem("currentOrderNumber")) || 1;
+
+// Функция для генерации автоинкрементированного номера заказа
 function generateOrderNumber() {
-    var lastOrderNumber = parseInt(localStorage.getItem("lastOrderNumber")) || 0;
-    var orderNumber = lastOrderNumber + 1;
-    localStorage.setItem("lastOrderNumber", orderNumber);
-    return orderNumber;
+    // Увеличиваем номер заказа и сохраняем в localStorage
+    localStorage.setItem("currentOrderNumber", ++currentOrderNumber);
+    return currentOrderNumber;
+}
+
+// Функция для отправки данных на сервер
+function sendOrderToServer(orderData) {
+    // код для отправки данных на сервер
+    fetch('http://localhost:8080/basket', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+    })
+        .then(response => response.json())
+        .then(data => {
+            // Обработка ответа от сервера (если необходимо)
+            console.log('Сервер ответил:', data);
+        })
+        .catch(error => {
+            // Обработка ошибок при отправке на сервер
+            console.error('Ошибка при отправке данных на сервер:', error);
+        });
+}
+
+
+// Функция для получения значения куки по имени
+function getCookie(name) {
+    var match = document.cookie.match(new RegExp(name + '=([^;]+)'));
+    return match ? match[1] : null;
 }
 
 // Функция для обработки оформления заказа
 function checkout() {
-    var cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    // Отправка данных на сервер (замените URL на ваш)
-    var serverURL = "http://localhost:8080/basket";
-    var orderData = {
-        orderNumber: generateOrderNumber(),
-        items: cart
-    };
+    // Пытаемся получить значение куки с именем 'username'
+    var username = getCookie("username");
+    // Проверяем, есть ли значение куки
+    if (username) {
+        // Пользователь авторизован
+        console.log('Пользователь ' + username + ' авторизован');
+        // код для оформления заказа
+        var cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    // Замените это на реальный код отправки данных на сервер
-    fetch(serverURL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(orderData)
-    })
-        .then(response => response.json())
-        .then(data => {
-            // Обработка успешного ответа от сервера
-            console.log("Order submitted successfully:", data);
-            // Дополнительные действия по вашему выбору
-        })
-        .catch(error => {
-            // Обработка ошибки при отправке на сервер
-            console.error("Error submitting order:", error);
-            // Дополнительные действия по вашему выбору
-        });
+        // Генерируем номер заказа
+        var orderNumber = generateOrderNumber();
 
-    // Выводим номер заказа
-    alert("Заказ успешно оформлен. Номер заказа: " + orderNumber);
+        var username = getCookie("username");
 
-    // Очищаем корзину
-    clearCart();
+        // Отправляем данные на сервер
+        var orderData = {
+            orderNumber: orderNumber,
+            cart: cart,
+            username: username
+            // Дополнительные данные заказа, если необходимо
+        };
+        sendOrderToServer(orderData);
 
-    // Перезагружаем страницу (или выполните другие действия по вашему выбору)
+        // Выводим номер заказа
+        alert("Заказ успешно оформлен. Номер заказа: " + orderNumber);
+
+        // Очищаем корзину
+        clearCart();
+
+    } else {
+        // Перенаправляем пользователя на страницу входа
+        window.location.href = 'login.html';
+        return;
+    }
+}
+
+function clearCart() {
+    localStorage.removeItem("cart");
     location.reload();
 }
 
-// Функция для очистки корзины
-function clearCart() {
-    localStorage.removeItem("cart");
-    // Дополнительные действия, если необходимо
-    // Например, обновление отображения корзины на странице
-    displayCartItems();
+// Функция для получения значения cookie по имени
+function getCookie(name) {
+    var nameEQ = name + "=";
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i];
+        while (cookie.charAt(0) === ' ') {
+            cookie = cookie.substring(1, cookie.length);
+        }
+        if (cookie.indexOf(nameEQ) === 0) {
+            return decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
+        }
+    }
+    return null;
 }
-

@@ -19,6 +19,7 @@ function loginUser() {
         .then(response => {
             if (response.ok) {
                 // Если статус ответа 200, перенаправляем пользователя в личный кабинет
+                setCookie("username", username, 1);
                 window.location.href = 'user_lk.html';
             } else {
                 // Если есть ошибка, выводим сообщение об ошибке
@@ -28,4 +29,13 @@ function loginUser() {
         .catch(error => {
             console.error('Ошибка при аутентификации:', error);
         });
+}
+
+// Функция для установки cookie
+function setCookie(name, value, daysToExpire) {
+    var expirationDate = new Date();
+    expirationDate.setDate(expirationDate.getDate() + daysToExpire);
+
+    var cookieString = name + "=" + encodeURIComponent(value) + "; expires=" + expirationDate.toUTCString() + "; path=/";
+    document.cookie = cookieString;
 }
