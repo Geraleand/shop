@@ -12,7 +12,7 @@ open class Authority {
 
     @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "username", referencedColumnName = "username")
-    open var username: User? = null
+    open var user: User? = null
 
     @Column(name = "authority", length = Integer.MAX_VALUE)
     open var authority: String? = null

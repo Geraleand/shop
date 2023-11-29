@@ -6,3 +6,7 @@ spring:
     password: postgres
     hikari:
       schema: public
+
+jwt:
+  access-token-expiration: 3600000
+  refresh-token-expiration: 86400000

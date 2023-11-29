@@ -1,0 +1,129 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert_user_admin
+      author: admin
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: admin
+              - column:
+                  name: password
+                  value: $2a$12$bx4cGeqKOtyP69oIfZY7Ne/xbL2AjkdXoLDLmNXhaCUIYKgtejidy
+              - column:
+                  name: email
+                  value: admin@email.ru
+              - column:
+                  name: first_name
+                  value: Админ
+              - column:
+                  name: last_name
+                  value: Админов
+              - column:
+                  name: phone
+                  value: '+79997777777'
+              - column:
+                  name: enabled
+                  value: 'true'
+
+  - changeSet:
+      id: insert_user_seller
+      author: admin
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: seller
+              - column:
+                  name: password
+                  value: $2a$12$e8lkru4H8ldVmPM7eS0H6u.tPnR/1L8v9Ay6DG0GbYBWS89CVzb5a
+              - column:
+                  name: email
+                  value: seller@email.ru
+              - column:
+                  name: first_name
+                  value: Продавец
+              - column:
+                  name: last_name
+                  value: Продавцов
+              - column:
+                  name: phone
+                  value: '+79996666666'
+              - column:
+                  name: enabled
+                  value: 'true'
+
+  - changeSet:
+      id: insert_user_client1
+      author: admin
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: client1
+              - column:
+                  name: password
+                  value: $2a$12$s4fociih3.b3QOMjaWMM/e8zqC8w2a41sMb1KgfVySemQL4m1Rqs6
+              - column:
+                  name: email
+                  value: client1@email.ru
+              - column:
+                  name: first_name
+                  value: Покупатель1
+              - column:
+                  name: last_name
+                  value: Покупателев1
+              - column:
+                  name: phone
+                  value: '+79995555555'
+              - column:
+                  name: enabled
+                  value: 'true'
+
+  - changeSet:
+      id: insert_authorities_admin
+      author: admin
+      changes:
+        - insert:
+            tableName: authorities
+            columns:
+              - column:
+                  name: username
+                  value: admin
+              - column:
+                  name: authority
+                  value: ADMIN
+
+  - changeSet:
+      id: insert_authorities_seller
+      author: admin
+      changes:
+        - insert:
+            tableName: authorities
+            columns:
+              - column:
+                  name: username
+                  value: seller
+              - column:
+                  name: authority
+                  value: SELLER
+
+  - changeSet:
+      id: insert_authorities_client1
+      author: admin
+      changes:
+        - insert:
+            tableName: authorities
+            columns:
+              - column:
+                  name: username
+                  value: client1
+              - column:
+                  name: authority
+                  value: CLIENT

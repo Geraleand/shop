@@ -33,15 +33,13 @@ class UserService(
         user.phone = userDTO.phone
         val savedUser = userRepository.save(user)
         val authority = Authority()
-        authority.username = savedUser
+        authority.user = savedUser
         authority.authority = "CLIENT"
         authorityRepository.save(authority)
     }
 
     fun isLoginCorrect(username: String, password: String): Boolean {
-        val user = userRepository.findByUsernameIgnoreCase(username).orElse(null)
-        if (user == null)
-            return false
+        val user = userRepository.findByUsernameIgnoreCase(username).orElse(null) ?: return false
         return encoder.matches(password, user.password)
     }
 }
