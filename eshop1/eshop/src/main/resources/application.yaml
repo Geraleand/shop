@@ -6,3 +6,9 @@ spring:
     password: 1
     hikari:
       schema: public
+
+# application.yml
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
