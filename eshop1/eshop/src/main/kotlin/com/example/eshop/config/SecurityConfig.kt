@@ -32,12 +32,18 @@ class SecurityConfig(
             .csrf { it.disable() }
             .authorizeHttpRequests {
                 it
+                    .requestMatchers("/loginPage**", "/loginPage/**", "/styles/css/**", "/js/**")
+                    .permitAll()
                     .requestMatchers("/api/auth**")
                     .permitAll()
                     .requestMatchers("/api/admin/**")
                     .hasAuthority("ADMIN")
+                    .requestMatchers("/purchase/**")
+                    .hasAuthority("ADMIN")
                     .anyRequest()
                     .fullyAuthenticated()
+//                    .anyRequest()
+//                    .permitAll()
             }
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

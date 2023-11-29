@@ -38,8 +38,4 @@ class UserService(
         authorityRepository.save(authority)
     }
 
-    fun isLoginCorrect(username: String, password: String): Boolean {
-        val user = userRepository.findByUsernameIgnoreCase(username).orElse(null) ?: return false
-        return encoder.matches(password, user.password)
-    }
 }
