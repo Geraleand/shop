@@ -10,5 +10,9 @@ interface ProductRepository : JpaRepository<Product, String> {
 
     fun findByTitleIgnoreCase(title: String): Optional<Product>
 
+    fun findByCategoryIgnoreCase(category: String): Optional<Product>
+
+
+
 }
 
