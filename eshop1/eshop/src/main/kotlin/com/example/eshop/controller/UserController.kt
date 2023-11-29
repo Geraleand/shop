@@ -19,4 +19,10 @@ class UserController(
         userService.addUser(userDTO)
         return ResponseEntity(HttpStatus.OK)
     }
+
+    @GetMapping("get-users")
+    fun getUsers(): List<User> {
+        val users = userService.getUsers()
+        return users
+    }
 }

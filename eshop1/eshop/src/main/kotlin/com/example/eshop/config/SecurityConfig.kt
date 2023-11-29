@@ -10,6 +10,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.provisioning.JdbcUserDetailsManager
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository
+import org.springframework.security.web.csrf.CsrfTokenRepository
 import javax.sql.DataSource
 
 @Configuration
@@ -27,10 +29,12 @@ class SecurityConfig(
     @Order(1)
     fun publicFilterChain(http: HttpSecurity): SecurityFilterChain {
         http {
-            securityMatcher("/user/**")
-            authorizeHttpRequests {
-                authorize(anyRequest, permitAll)
-            }
+
+//            securityMatcher("/user/**")
+//            authorizeHttpRequests {
+//                authorize(anyRequest, permitAll)
+//            }
+//            formLogin { permitAll() }
 
             csrf { disable() }
 
@@ -38,6 +42,26 @@ class SecurityConfig(
         return http.build()
     }
 
+//    @Bean
+//    fun securityFilter(http: HttpSecurity): SecurityFilterChain {
+//        http {
+//            securityMatcher("/admin/**")
+//            authorizeHttpRequests {
+//                authorize(anyRequest, hasAuthority("ADMIN"))
+//            }
+//
+//            httpBasic {  }
+//        }
+//
+//        return http.build()
+//    }
+
+    @Bean
+    fun csrfTokenRepository(): CsrfTokenRepository {
+        val cookieCsrfTokenRepository = CookieCsrfTokenRepository()
+        cookieCsrfTokenRepository.cookiePath ="/"
+        return cookieCsrfTokenRepository
+    }
 
     @Bean
     fun passwordEncoder(): PasswordEncoder {

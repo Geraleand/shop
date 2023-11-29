@@ -8,12 +8,17 @@ function loginUser() {
         password: password
     };
 
+    // let formData = new FormData();
+    // formData.append('username', username);
+    // formData.append('password', username);
+
     // Отправляем данные на бэкенд
     fetch('http://localhost:8080/login', {
-        method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
+        method: 'POST',
+        // body: formData
         body: JSON.stringify(authData)
     })
         .then(response => {

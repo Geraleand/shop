@@ -16,6 +16,10 @@ class UserService(
     private val encoder: PasswordEncoder
 ) {
 
+    fun getUsers(): List<User> {
+        return userRepository.findAll();
+    }
+
     @Transactional
     fun addUser(userDTO: UserDTO) {
         if (userRepository.existsByUsernameIgnoreCase(userDTO.username))

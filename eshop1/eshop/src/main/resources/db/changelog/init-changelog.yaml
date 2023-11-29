@@ -1,0 +1,347 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1701271692716-1
+      author: Ivan.Zhirnov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: categories_pk
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR
+            tableName: categories
+  - changeSet:
+      id: 1701271692716-2
+      author: Ivan.Zhirnov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: products_pk
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: title
+                  type: VARCHAR
+              - column:
+                  constraints:
+                    nullable: false
+                  name: article
+                  type: VARCHAR
+              - column:
+                  name: photo
+                  type: BYTEA
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: !!float '0'
+                  name: count
+                  type: INTEGER
+              - column:
+                  name: supplier
+                  type: VARCHAR
+              - column:
+                  name: category_id
+                  type: INTEGER
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: 0.0
+                  name: price
+                  type: FLOAT8
+            tableName: products
+  - changeSet:
+      id: 1701271692716-3
+      author: Ivan.Zhirnov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: carts_pk
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+            tableName: carts
+  - changeSet:
+      id: 1701271692716-4
+      author: Ivan.Zhirnov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: cart_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: product_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: !!float '1'
+                  name: count
+                  type: INTEGER
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: cart_items_pk
+                  name: id
+                  type: BIGINT
+            tableName: cart_items
+  - changeSet:
+      id: 1701271692716-5
+      author: Ivan.Zhirnov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: purchase_pk
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: now()
+                  name: creation_date
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueBoolean: false
+                  name: is_paid
+                  type: BOOLEAN
+              - column:
+                  name: payment_date
+                  type: TIMESTAMP WITHOUT TIME ZONE
+            tableName: purchase
+  - changeSet:
+      id: 1701271692716-6
+      author: Ivan.Zhirnov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: purchase_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: product_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: !!float '1'
+                  name: count
+                  type: INTEGER
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: 0.0
+                  name: price
+                  type: FLOAT8
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: purchase_item_pk
+                  name: id
+                  type: BIGINT
+            tableName: purchase_items
+  - changeSet:
+      id: 1701271692716-7
+      author: Ivan.Zhirnov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: authorities_pkey
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: username
+                  type: VARCHAR
+              - column:
+                  name: authority
+                  type: VARCHAR
+            tableName: authorities
+  - changeSet:
+      id: 1701271692716-8
+      author: Ivan.Zhirnov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: users_pkey
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: username
+                  type: VARCHAR
+              - column:
+                  name: password
+                  type: VARCHAR
+              - column:
+                  name: email
+                  type: VARCHAR
+              - column:
+                  name: first_name
+                  type: VARCHAR
+              - column:
+                  name: last_name
+                  type: VARCHAR
+              - column:
+                  name: phone
+                  type: VARCHAR
+              - column:
+                  name: enabled
+                  type: BOOLEAN
+            tableName: users
+  - changeSet:
+      id: 1701271692716-9
+      author: Ivan.Zhirnov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: cart_id
+            baseTableName: cart_items
+            constraintName: cart_items_carts_id_fk
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            referencedColumnNames: id
+            referencedTableName: carts
+  - changeSet:
+      id: 1701271692716-10
+      author: Ivan.Zhirnov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: product_id
+            baseTableName: cart_items
+            constraintName: cart_items_products_id_fk
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: products
+  - changeSet:
+      id: 1701271692716-11
+      author: Ivan.Zhirnov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: carts
+            constraintName: carts_users_id_fk
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: 1701271692716-12
+      author: Ivan.Zhirnov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: category_id
+            baseTableName: products
+            constraintName: products_categories_id_fk
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            referencedColumnNames: id
+            referencedTableName: categories
+  - changeSet:
+      id: 1701271692716-13
+      author: Ivan.Zhirnov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: product_id
+            baseTableName: purchase_items
+            constraintName: purchase_item_products_id_fk
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: products
+  - changeSet:
+      id: 1701271692716-14
+      author: Ivan.Zhirnov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: purchase_id
+            baseTableName: purchase_items
+            constraintName: purchase_item_purchase_id_fk
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: purchase
+  - changeSet:
+      id: 1701271692716-15
+      author: Ivan.Zhirnov (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: purchase
+            constraintName: purchase_users_id_fk
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: users
+

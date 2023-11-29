@@ -22,6 +22,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+function getUsers() {
+    // fetch('http://localhost:8080/user/get-users', {
+    fetch('http://localhost:8080/admin/get-users', {
+        method: 'GET'
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+        })
+}
+
 function showPage(pageName) {
     // Получаем элемент, в который будем вставлять контент страницы
     var pageContent = document.getElementById("pageContent");
