@@ -12,6 +12,6 @@ class ProductsController(
     private val productsService: ProductsService
 ) {
 
-    @GetMapping
+    @GetMapping("/get")
     fun getProducts(): List<ProductDTO> = productsService.getProducts()
 }

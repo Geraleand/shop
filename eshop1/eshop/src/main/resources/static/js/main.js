@@ -1,5 +1,3 @@
-<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossOrigin="anonymous"></script>
-
 document.addEventListener("DOMContentLoaded", function() {
     // Получаем элемент ввода и кнопку отмены
     var searchInput = document.getElementsByName("search")[0];
@@ -17,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
 function incrementQuantity(card, availableQuantity) {
     var quantityInput = card.querySelector('.quantity-input');
     var currentValue = parseInt(quantityInput.value, 10);
+
     if (currentValue < availableQuantity) {
         quantityInput.value = currentValue + 1;
     }
@@ -25,6 +24,7 @@ function incrementQuantity(card, availableQuantity) {
 function decrementQuantity(card) {
     var quantityInput = card.querySelector('.quantity-input');
     var currentValue = parseInt(quantityInput.value, 10);
+
     if (currentValue > 1) {
         quantityInput.value = currentValue - 1;
     }
@@ -103,12 +103,13 @@ function generateOrderNumber() {
 }
 
 // Функция для отправки данных на сервер
-function sendOrderToServer(orderData) {
+function sendOrderToServer(orderData, token) {
     // код для отправки данных на сервер
-    fetch('http://localhost:8080/basket', {
+    fetch('http://localhost:8080/purchase/create', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token // Добавляем токен в заголовки запроса
         },
         body: JSON.stringify(orderData),
     })
@@ -123,45 +124,39 @@ function sendOrderToServer(orderData) {
         });
 }
 
-
-// Функция для получения значения куки по имени
-function getCookie(name) {
-    var match = document.cookie.match(new RegExp(name + '=([^;]+)'));
-    return match ? match[1] : null;
-}
-
 // Функция для обработки оформления заказа
 function checkout() {
+    // Пытаемся получить токен из localStorage
+    var token = localStorage.getItem('token');
 
-    // Пытаемся получить значение куки с именем 'username'
-    var username = getCookie("username");
-    // Проверяем, есть ли значение куки
-    if (username) {
+    // Проверяем, есть ли токен
+    if (token) {
         // Пользователь авторизован
-        console.log('Пользователь ' + username + ' авторизован');
+
+        console.log('Пользователь авторизован');
+
         // код для оформления заказа
         var cart = JSON.parse(localStorage.getItem("cart")) || [];
 
         // Генерируем номер заказа
         var orderNumber = generateOrderNumber();
 
-        var username = getCookie("username");
-
         // Отправляем данные на сервер
         var orderData = {
             orderNumber: orderNumber,
             cart: cart,
-            username: username
+            // username: username // Убираем использование куки username
             // Дополнительные данные заказа, если необходимо
         };
-        sendOrderToServer(orderData);
+
+        // Отправляем данные на сервер, включая токен
+        sendOrderToServer(orderData, token);
 
         // Выводим номер заказа
         alert("Заказ успешно оформлен. Номер заказа: " + orderNumber);
 
         // Очищаем корзину
         clearCart();
-
     } else {
         // Перенаправляем пользователя на страницу входа
         window.location.href = 'login.html';
@@ -174,18 +169,102 @@ function clearCart() {
     location.reload();
 }
 
-// Функция для получения значения cookie по имени
-function getCookie(name) {
-    var nameEQ = name + "=";
-    var cookies = document.cookie.split(';');
-    for (var i = 0; i < cookies.length; i++) {
-        var cookie = cookies[i];
-        while (cookie.charAt(0) === ' ') {
-            cookie = cookie.substring(1, cookie.length);
-        }
-        if (cookie.indexOf(nameEQ) === 0) {
-            return decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
-        }
+document.addEventListener('DOMContentLoaded', function () {
+    // эндпоинт, который возвращает данные о продуктах
+    const apiUrl = '/products/get';
+
+    // Получаем контейнер, в который будем добавлять карточки товаров
+    const productContainer = document.getElementById('product-container');
+
+    // Выполняем запрос к бэкенду для получения данных о продуктах
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(products => {
+            // Создаем карточки товаров для каждого продукта
+            products.forEach(product => {
+                const card = createProductCard(product);
+                productContainer.appendChild(card);
+            });
+        })
+        .catch(error => console.error('Error fetching products:', error));
+
+    // Функция для создания карточки товара
+    function createProductCard(product) {
+        const card = document.createElement('div');
+        card.classList.add('card');
+
+        // Верхняя часть карточки (изображение)
+        const cardTop = document.createElement('div');
+        cardTop.classList.add('card__top');
+
+        const imageLink = document.createElement('a');
+        imageLink.classList.add('card__image');
+        imageLink.href = '#';
+
+        const productImage = document.createElement('img');
+        productImage.classList.add('basket__image');
+        productImage.src = `data:image/jpeg;base64,${product.photo}`;
+        productImage.alt = product.name;
+
+        imageLink.appendChild(productImage);
+        cardTop.appendChild(imageLink);
+        card.appendChild(cardTop);
+
+        // Нижняя часть карточки (цена, название, кнопка добавить в корзину и т.д.)
+        const cardBottom = document.createElement('div');
+        cardBottom.classList.add('card__bottom');
+
+        const price = document.createElement('div');
+        price.classList.add('card__price');
+        price.textContent = product.price; // Замените на поле, содержащее цену продукта
+
+        const titleLink = document.createElement('a');
+        titleLink.classList.add('card__title');
+        titleLink.href = '#';
+        titleLink.textContent = product.name;
+
+        const quantityContainer = document.createElement('div');
+        quantityContainer.classList.add('quantity-container');
+
+        const decrementButton = document.createElement('button');
+        decrementButton.classList.add('quantity-btn');
+        decrementButton.textContent = '-';
+        // Добавьте обработчик события для уменьшения количества товара
+        decrementButton.addEventListener('click', function() {
+            decrementQuantity(card);
+        });
+
+        const quantityInput = document.createElement('input');
+        quantityInput.classList.add('quantity-input');
+        quantityInput.value = '1';
+
+        const incrementButton = document.createElement('button');
+        incrementButton.classList.add('quantity-btn');
+        incrementButton.textContent = '+';
+        // Добавьте обработчик события для увеличения количества товара
+        incrementButton.addEventListener('click', function() {
+            incrementQuantity(card, product.availableCount); // Передаем availableCount из данных продукта
+        });
+
+        const addButton = document.createElement('button');
+        addButton.classList.add('card__add');
+        addButton.textContent = 'В корзину';
+        // Добавьте обработчик события для добавления товара в корзину
+        addButton.addEventListener('click', function() {
+            addToCart(card);
+        });
+
+        quantityContainer.appendChild(decrementButton);
+        quantityContainer.appendChild(quantityInput);
+        quantityContainer.appendChild(incrementButton);
+
+        cardBottom.appendChild(price);
+        cardBottom.appendChild(titleLink);
+        cardBottom.appendChild(quantityContainer);
+        cardBottom.appendChild(addButton);
+
+        card.appendChild(cardBottom);
+
+        return card;
     }
-    return null;
-}
+});
