@@ -160,10 +160,24 @@ function showPage(pageName) {
 
         // Добавьте функцию для удаления товара
         function deleteProduct(productId) {
-            // Здесь добавьте код для удаления товара из базы данных
-            // В этом примере, просто выведем сообщение об успешном удалении
-            alert('Товар удален');
+            // Отправляем запрос на сервер для удаления товара по артикулу
+            fetch(`http://localhost:8080/product/delete/${productId}`, {
+                method: 'DELETE',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Обработка ответа от сервера
+                    console.log('Сервер ответил:', data);
+                    alert('Товар успешно удален!');
+                    showProductThumbnails(); // Обновляем список товаров после удаления
+                })
+                .catch(error => {
+                    // Обработка ошибок при отправке запроса на сервер
+                    console.error('Ошибка при удалении товара:', error);
+                    alert('Произошла ошибка при удалении товара.');
+                });
         }
+
 
         // Добавьте функцию для отображения формы редактирования товара
         function showEditForm(product) {
@@ -199,11 +213,44 @@ function showPage(pageName) {
   `;
 
 
+            function sendProductUpdate(productData) {
+                fetch('http://localhost:8080/product/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(productData),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Обработка ответа от сервера
+                        console.log('Сервер ответил:', data);
+                        alert('Изменения сохранены!');
+                    })
+                    .catch(error => {
+                        // Обработка ошибок при отправке на сервер
+                        console.error('Ошибка при отправке данных на сервер:', error);
+                        alert('Произошла ошибка при сохранении изменений.');
+                    });
+            }
+
             // Добавьте обработчик события для сохранения изменений
             formElement.addEventListener('submit', function (event) {
                 event.preventDefault();
-                // Добавьте код для сохранения изменений в базу данных
-                alert('Изменения сохранены!');
+
+                // Получение данных из формы
+                var productData = {
+                    name: document.getElementById('productName').value,
+                    article: document.getElementById('productCode').value,
+                    photo: document.getElementById('productPhoto').value, // Здесь могут быть изменения
+                    price: parseFloat(document.getElementById('productPrice').value),
+                    quantity: parseInt(document.getElementById('productQuantity').value),
+                    supplier: document.getElementById('productSupplier').value,
+                    // Добавьте другие поля, если они есть
+                };
+
+                // Отправка данных на сервер
+                sendProductUpdate(productData);
             });
 
             // Добавьте обработчик события для кнопки "Удалить товар"

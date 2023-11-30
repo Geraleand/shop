@@ -1,6 +1,6 @@
 $(document).ready(function () {
     // Загрузка данных о товарах с сервера
-    $.get("/api/products", function (products) {
+    $.get("http://localhost:8080/cart/get-cart", function (products) {
         // Перебор массива товаров и создание карточек
         products.forEach(function (product) {
             var card = '<div class="card">' +

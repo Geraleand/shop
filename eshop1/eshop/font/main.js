@@ -1,3 +1,5 @@
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossOrigin="anonymous"></script>
+
 document.addEventListener("DOMContentLoaded", function() {
     // Получаем элемент ввода и кнопку отмены
     var searchInput = document.getElementsByName("search")[0];
@@ -12,17 +14,22 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-function incrementQuantity(card) {
+function incrementQuantity(card, availableQuantity) {
     var quantityInput = card.querySelector('.quantity-input');
-    quantityInput.value = parseInt(quantityInput.value) + 1;
+    var currentValue = parseInt(quantityInput.value, 10);
+    if (currentValue < availableQuantity) {
+        quantityInput.value = currentValue + 1;
+    }
 }
 
 function decrementQuantity(card) {
     var quantityInput = card.querySelector('.quantity-input');
-    if (parseInt(quantityInput.value) > 1) {
-        quantityInput.value = parseInt(quantityInput.value) - 1;
+    var currentValue = parseInt(quantityInput.value, 10);
+    if (currentValue > 1) {
+        quantityInput.value = currentValue - 1;
     }
 }
+
 // Определение функции для добавления товара в корзину
 function addToCart(cardElement) {
     var quantityInput = cardElement.querySelector(".quantity-input");
