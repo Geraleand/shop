@@ -15,7 +15,7 @@ function registerUser() {
 
     // Создаем объект с данными пользователя
     var userData = {
-        username: login,
+        login: login,
         firstName: firstName,
         lastName: lastName,
         phone: phone,
@@ -24,7 +24,7 @@ function registerUser() {
     };
 
     // Отправляем данные на бэкенд
-    fetch('http://localhost:8080/user/sign-up', {
+    fetch('http://localhost:8080/register', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -35,7 +35,6 @@ function registerUser() {
         .then(data => {
             console.log('Успешно зарегистрирован:', data);
             // Можно выполнить дополнительные действия после успешной регистрации
-            window.location.href = 'user_lk.html';
         })
         .catch(error => {
             console.error('Ошибка при регистрации:', error);

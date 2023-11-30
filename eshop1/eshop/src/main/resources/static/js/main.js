@@ -1,26 +1,35 @@
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossOrigin="anonymous"></script>
+
 document.addEventListener("DOMContentLoaded", function() {
     // Получаем элемент ввода и кнопку отмены
     var searchInput = document.getElementsByName("search")[0];
     var clearSearchButton = document.querySelector(".search-cancel");
 
-    // Добавляем обработчик события клика на кнопку отмены
-    clearSearchButton.addEventListener("click", function() {
-        // Очищаем значение поля ввода
-        searchInput.value = "";
-    });
+    if (clearSearchButton) {
+        // Добавляем обработчик события клика на кнопку отмены
+        clearSearchButton.addEventListener("click", function () {
+            // Очищаем значение поля ввода
+            searchInput.value = "";
+        });
+    }
 });
 
-function incrementQuantity(card) {
+function incrementQuantity(card, availableQuantity) {
     var quantityInput = card.querySelector('.quantity-input');
-    quantityInput.value = parseInt(quantityInput.value) + 1;
+    var currentValue = parseInt(quantityInput.value, 10);
+    if (currentValue < availableQuantity) {
+        quantityInput.value = currentValue + 1;
+    }
 }
 
 function decrementQuantity(card) {
     var quantityInput = card.querySelector('.quantity-input');
-    if (parseInt(quantityInput.value) > 1) {
-        quantityInput.value = parseInt(quantityInput.value) - 1;
+    var currentValue = parseInt(quantityInput.value, 10);
+    if (currentValue > 1) {
+        quantityInput.value = currentValue - 1;
     }
 }
+
 // Определение функции для добавления товара в корзину
 function addToCart(cardElement) {
     var quantityInput = cardElement.querySelector(".quantity-input");
@@ -39,8 +48,11 @@ function addToCart(cardElement) {
         image: productImage
     };
 
+    var cart = []
     // Получение текущего содержимого корзины из localStorage
-    var cart = JSON.parse(localStorage.getItem("cart")) || [];
+    if (localStorage.getItem("cart") !== null && localStorage.getItem("cart") !== undefined) {
+        cart = JSON.parse(localStorage.getItem("cart"));
+    }
 
     // Проверка, есть ли уже такой товар в корзине
     var existingProduct = cart.find(item => item.name === productName);
@@ -76,44 +88,104 @@ document.addEventListener("DOMContentLoaded", function () {
             addToCart(button.closest(".card"));
         });
     });
-
     // Обновление количества товаров в иконке корзины при загрузке страницы
     updateCartIcon();
 });
 
-// Функция для генерации случайного номера заказа
+// Инициализация текущего номера заказа при загрузке страницы
+var currentOrderNumber = parseInt(localStorage.getItem("currentOrderNumber")) || 1;
+
+// Функция для генерации автоинкрементированного номера заказа
 function generateOrderNumber() {
-    return Math.floor(Math.random() * 1000000) + 1;
+    // Увеличиваем номер заказа и сохраняем в localStorage
+    localStorage.setItem("currentOrderNumber", ++currentOrderNumber);
+    return currentOrderNumber;
+}
+
+// Функция для отправки данных на сервер
+function sendOrderToServer(orderData) {
+    // код для отправки данных на сервер
+    fetch('http://localhost:8080/basket', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+    })
+        .then(response => response.json())
+        .then(data => {
+            // Обработка ответа от сервера (если необходимо)
+            console.log('Сервер ответил:', data);
+        })
+        .catch(error => {
+            // Обработка ошибок при отправке на сервер
+            console.error('Ошибка при отправке данных на сервер:', error);
+        });
+}
+
+
+// Функция для получения значения куки по имени
+function getCookie(name) {
+    var match = document.cookie.match(new RegExp(name + '=([^;]+)'));
+    return match ? match[1] : null;
 }
 
 // Функция для обработки оформления заказа
 function checkout() {
-    var cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    // Здесь вы можете добавить дополнительную логику обработки заказа,
-    // например, отправку данных на сервер и т.д.
+    // Пытаемся получить значение куки с именем 'username'
+    var username = getCookie("username");
+    // Проверяем, есть ли значение куки
+    if (username) {
+        // Пользователь авторизован
+        console.log('Пользователь ' + username + ' авторизован');
+        // код для оформления заказа
+        var cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    // Генерируем номер заказа
-    var orderNumber = generateOrderNumber();
+        // Генерируем номер заказа
+        var orderNumber = generateOrderNumber();
 
-    // Выводим номер заказа
-    alert("Заказ успешно оформлен. Номер заказа: " + orderNumber);
+        var username = getCookie("username");
 
-    // Очищаем корзину
-    clearCart();
+        // Отправляем данные на сервер
+        var orderData = {
+            orderNumber: orderNumber,
+            cart: cart,
+            username: username
+            // Дополнительные данные заказа, если необходимо
+        };
+        sendOrderToServer(orderData);
 
-    // Перезагружаем страницу (или выполните другие действия по вашему выбору)
+        // Выводим номер заказа
+        alert("Заказ успешно оформлен. Номер заказа: " + orderNumber);
+
+        // Очищаем корзину
+        clearCart();
+
+    } else {
+        // Перенаправляем пользователя на страницу входа
+        window.location.href = 'login.html';
+        return;
+    }
+}
+
+function clearCart() {
+    localStorage.removeItem("cart");
     location.reload();
 }
 
-// Функция для очистки корзины
-function clearCart() {
-    localStorage.removeItem("cart");
-    // Дополнительные действия, если необходимо
-    // Например, обновление отображения корзины на странице
-    displayCartItems();
+// Функция для получения значения cookie по имени
+function getCookie(name) {
+    var nameEQ = name + "=";
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i];
+        while (cookie.charAt(0) === ' ') {
+            cookie = cookie.substring(1, cookie.length);
+        }
+        if (cookie.indexOf(nameEQ) === 0) {
+            return decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
+        }
+    }
+    return null;
 }
-
-// Добавьте обработчик события для кнопки "Оформить заказ"
-var checkoutButton = document.getElementById("checkoutButton");
-checkoutButton.addEventListener("click", checkout);

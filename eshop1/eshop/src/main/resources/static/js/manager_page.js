@@ -54,28 +54,45 @@ function showPage(pageName) {
 
             <label for="productSupplier">Поставщик:</label>
             <input type="text" id="productSupplier" name="productSupplier" required><br>
+            
+            <label for="productCategory">Категория:</label>
+            <input type="text" id="productCategory" name="productCategory" required><br>
 
             <button type="submit">Добавить товар</button>
         `;
 
         // Добавляем обработчик события для формы
-        formElement.addEventListener('submit', function(event) {
-            event.preventDefault();
-            // Добавьте код для обработки данных формы
+            formElement.addEventListener('submit', function (event) {
+                event.preventDefault();
 
-            // Проверка на целые числа в полях "Цена" и "Количество"
-            var price = parseInt(document.getElementById('productPrice').value, 10);
-            var quantity = parseInt(document.getElementById('productQuantity').value, 10);
+                // Получение данных из формы
+                var productName = document.getElementById('productName').value;
+                var productCode = document.getElementById('productCode').value;
+                var productPhoto = document.getElementById('productPhoto');
+                var productPrice = document.getElementById('productPrice').value;
+                var productQuantity = document.getElementById('productQuantity').value;
+                var productSupplier = document.getElementById('productSupplier').value;
+                var productCategory = document.getElementById('productCategory').value;
 
-            if (isNaN(price) || isNaN(quantity) || price % 1 !== 0 || quantity % 1 !== 0) {
-                alert('Введите числовые значения в поля цена и количество.');
-                return;
-            }
+                // Создание объекта товара
+                const formData = new FormData();
+                formData.append('title', productName);
+                formData.append('article', productCode);
+                formData.append('photo', productPhoto.files[0]); // Здесь inputElement - ваш элемент input типа file
+                formData.append('price', parseFloat(productPrice));
+                formData.append('quantity', parseInt(productQuantity));
+                formData.append('supplier', productSupplier);
+                formData.append('category', productCategory);
+
+                // Отправка данных на сервер
+                sendProductData(formData);
 
             alert('Товар успешно добавлен!');
             this.reset();
         });
         pageContent.appendChild(formElement);
+
+
 
     } else if (pageName === "updateProduct") {
         pageContent.innerHTML = "<h2>Коррекция значений товара в базе данных</h2>";
@@ -143,10 +160,24 @@ function showPage(pageName) {
 
         // Добавьте функцию для удаления товара
         function deleteProduct(productId) {
-            // Здесь добавьте код для удаления товара из базы данных
-            // В этом примере, просто выведем сообщение об успешном удалении
-            alert('Товар удален');
+            // Отправляем запрос на сервер для удаления товара по артикулу
+            fetch(`http://localhost:8080/product/delete/${productId}`, {
+                method: 'DELETE',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Обработка ответа от сервера
+                    console.log('Сервер ответил:', data);
+                    alert('Товар успешно удален!');
+                    showProductThumbnails(); // Обновляем список товаров после удаления
+                })
+                .catch(error => {
+                    // Обработка ошибок при отправке запроса на сервер
+                    console.error('Ошибка при удалении товара:', error);
+                    alert('Произошла ошибка при удалении товара.');
+                });
         }
+
 
         // Добавьте функцию для отображения формы редактирования товара
         function showEditForm(product) {
@@ -182,11 +213,44 @@ function showPage(pageName) {
   `;
 
 
+            function sendProductUpdate(productData) {
+                fetch('http://localhost:8080/product/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(productData),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Обработка ответа от сервера
+                        console.log('Сервер ответил:', data);
+                        alert('Изменения сохранены!');
+                    })
+                    .catch(error => {
+                        // Обработка ошибок при отправке на сервер
+                        console.error('Ошибка при отправке данных на сервер:', error);
+                        alert('Произошла ошибка при сохранении изменений.');
+                    });
+            }
+
             // Добавьте обработчик события для сохранения изменений
             formElement.addEventListener('submit', function (event) {
                 event.preventDefault();
-                // Добавьте код для сохранения изменений в базу данных
-                alert('Изменения сохранены!');
+
+                // Получение данных из формы
+                var productData = {
+                    name: document.getElementById('productName').value,
+                    article: document.getElementById('productCode').value,
+                    photo: document.getElementById('productPhoto').value, // Здесь могут быть изменения
+                    price: parseFloat(document.getElementById('productPrice').value),
+                    quantity: parseInt(document.getElementById('productQuantity').value),
+                    supplier: document.getElementById('productSupplier').value,
+                    // Добавьте другие поля, если они есть
+                };
+
+                // Отправка данных на сервер
+                sendProductUpdate(productData);
             });
 
             // Добавьте обработчик события для кнопки "Удалить товар"
@@ -221,3 +285,22 @@ function showPage(pageName) {
     }
 }
 
+function sendProductData(formData) {
+    fetch('http://localhost:8080/product/add', {
+        method: 'POST',
+        body: formData,
+    })
+        .then(response => response.json())
+        .then(data => {
+            // Обработка ответа от сервера
+            console.log('Сервер ответил:', data);
+            alert('Товар успешно добавлен!');
+            // Очищаем форму
+            document.getElementById('addProductForm').reset();
+        })
+        .catch(error => {
+            // Обработка ошибок при отправке на сервер
+            console.error('Ошибка при отправке данных на сервер:', error);
+            alert('Произошла ошибка при добавлении товара.');
+        });
+}

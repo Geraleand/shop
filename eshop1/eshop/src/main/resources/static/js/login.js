@@ -8,32 +8,34 @@ function loginUser() {
         password: password
     };
 
-
     // Отправляем данные на бэкенд
-    fetch('http://localhost:8080/api/auth', {
+    fetch('http://localhost:8080/login', {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        method: 'POST',
-        // body: formData
         body: JSON.stringify(authData)
     })
-        // .then(response => {
-            // if (response.ok) {
-            //     // Если статус ответа 200, перенаправляем пользователя в личный кабинет
-            //     window.location.href = 'user_lk.html';
-            // } else {
-            //     // Если есть ошибка, выводим сообщение об ошибке
-            //     alert('Неверное имя пользователя или пароль');
-            // }
-        // })
-
-        .then(response => {response.json()})
-        .then(data => {
-            localStorage.setItem("eshop_access_token", data.accessToken);
-            localStorage.setItem("eshop_refresh_token", data.resreshToken);
+        .then(response => {
+            if (response.ok) {
+                // Если статус ответа 200, перенаправляем пользователя в личный кабинет
+                setCookie("username", username, 1);
+                window.location.href = 'user_lk.html';
+            } else {
+                // Если есть ошибка, выводим сообщение об ошибке
+                alert('Неверное имя пользователя или пароль');
+            }
         })
         .catch(error => {
             console.error('Ошибка при аутентификации:', error);
         });
+}
+
+// Функция для установки cookie
+function setCookie(name, value, daysToExpire) {
+    var expirationDate = new Date();
+    expirationDate.setDate(expirationDate.getDate() + daysToExpire);
+
+    var cookieString = name + "=" + encodeURIComponent(value) + "; expires=" + expirationDate.toUTCString() + "; path=/";
+    document.cookie = cookieString;
 }

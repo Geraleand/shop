@@ -5,8 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет покупателя</title>
-    <link rel="stylesheet" type="text/css" href="../static/styles/css/styles_index.css">
-    <script src="../static/js/user_page.js"></script>
+    <link rel="stylesheet" type="text/css" href="styles_index.css">
+    <script src="user_page.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
     <script crossorigin="anonymous" src="https://kit.fontawesome.com/c8e4d183c2.js"></script>
 </head>
@@ -16,11 +16,11 @@
 </header>
 
 <nav>
-    <a href="index_last.html">Главная</a>
+    <a href="index.html">Главная</a>
     <a href="about.html">О компании</a>
     <a href="contact.html">Контакты</a>
     <a href="catalog_all.html">Каталог</a>
-    <a href="index.html">Авторизация</a>
+    <a href="login.html">Вход</a>
     <!--right-menu----------->
     <div class="right-menu">
 
@@ -38,7 +38,7 @@
 <main id="mainContent">
     <div class="user-dashboard">
         <h2>Личный кабинет пользователя</h2>
-        <button id="logoutButton" onclick="getUsers()">Выход</button>
+        <button id="logoutButton">Выход</button>
         <div class="user-info" id="userInfo">
             <!-- Фамилия и имя пользователя будут вставлены здесь -->
         </div>
@@ -48,6 +48,7 @@
     <div class="seller-menu">
         <ul>
             <li><a href="#" onclick="showPage('updateData')">Коррекция личных данных</a></li>
+            <li><a href="#" onclick="showPage('updatePassword')">Изменить пароль</a></li>
             <li><a href="#" onclick="showPage('myOrder')">Мои заказы</a></li>
         </ul>
     </div>
