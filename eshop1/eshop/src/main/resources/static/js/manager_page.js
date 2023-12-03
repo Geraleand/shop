@@ -35,6 +35,24 @@ function showPage(pageName) {
         var formElement = document.createElement("form");
         formElement.id = "addProductForm";
 
+        // Получаем категории с сервера и заполняем выпадающий список
+        getCategories().then(categories => {
+            var categorySelect = document.createElement("select");
+            categorySelect.id = "productCategory";
+            categorySelect.name = "productCategory";
+            categorySelect.required = true;
+
+            categories.forEach(category => {
+                var option = document.createElement("option");
+                option.value = category.id; // Предполагается, что у категорий есть идентификатор
+                option.text = category.name; // Предполагается, что у категорий есть поле "name"
+                categorySelect.appendChild(option);
+            });
+
+            // Добавляем выпадающий список в форму
+            formElement.appendChild(categorySelect);
+        });
+
         formElement.innerHTML = `
             <h2>Ввод нового товара в базу данных</h2>
             <label for="productName">Название товара:</label>
@@ -187,6 +205,27 @@ function showPage(pageName) {
             const formElement = document.createElement("form");
             formElement.id = "editProductForm";
 
+            // Получаем категории с сервера и заполняем выпадающий список
+            getCategories().then(categories => {
+                const categorySelect = document.createElement("select");
+                categorySelect.id = "productCategory";
+                categorySelect.name = "productCategory";
+                categorySelect.required = true;
+
+                categories.forEach(category => {
+                    const option = document.createElement("option");
+                    option.value = category.id;
+                    option.text = category.name;
+                    categorySelect.appendChild(option);
+                });
+
+                // Выбираем текущую категорию товара
+                categorySelect.value = product.category;
+
+                // Добавляем выпадающий список в форму
+                formElement.appendChild(categorySelect);
+            });
+
             formElement.innerHTML = `
     <label for="productName">Название товара:</label>
     <input type="text" id="productName" name="productName" value="${product.name}" required><br>
@@ -281,7 +320,32 @@ function showPage(pageName) {
 
     } else if (pageName === "addCategory") {
         pageContent.innerHTML = "<h2>Добавление новой категории</h2>";
-        // Добавьте код для обновления товара
+        // Создаем элемент формы и добавляем его в контент страницы
+        var formElement = document.createElement("form");
+        formElement.id = "addCategoryForm";
+
+        formElement.innerHTML = `
+        <label for="newCategoryName">Название новой категории:</label>
+        <input type="text" id="newCategoryName" name="newCategoryName" required><br>
+
+        <button type="submit">Добавить категорию</button>
+    `;
+
+        // Добавляем обработчик события для формы
+        formElement.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            // Получение данных из формы
+            var newCategoryName = document.getElementById('newCategoryName').value;
+
+            // Отправка новой категории на сервер
+            sendNewCategory(newCategoryName);
+
+            alert('Новая категория успешно добавлена!');
+            this.reset();
+        });
+
+        pageContent.appendChild(formElement);
     } else if (pageName === "updateStatus") {
         pageContent.innerHTML = "<h2>Обновление статуса оплаты</h2>";
         // Добавьте код для обновления товара
@@ -305,5 +369,41 @@ function sendProductData(formData) {
             // Обработка ошибок при отправке на сервер
             console.error('Ошибка при отправке данных на сервер:', error);
             alert('Произошла ошибка при добавлении товара.');
+        });
+}
+
+function getCategories() {
+    return fetch('http://localhost:8080/category/all') // Предполагается, что у вас есть эндпоинт для получения категорий
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Не удалось получить категории с сервера');
+            }
+            return response.json();
+        })
+        .catch(error => {
+            console.error('Ошибка при получении категорий:', error);
+            alert('Произошла ошибка при получении категорий.');
+        });
+}
+
+function sendNewCategory(newCategoryName) {
+    // Отправка данных на сервер
+    fetch('http://localhost:8080/category/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: newCategoryName })
+    })
+        .then(response => response.json())
+        .then(data => {
+            // Обработка ответа от сервера
+            console.log('Сервер ответил:', data);
+
+        })
+        .catch(error => {
+            // Обработка ошибок при отправке на сервер
+            console.error('Ошибка при отправке данных на сервер:', error);
+            alert('Произошла ошибка при добавлении категории.');
         });
 }
