@@ -279,6 +279,9 @@ function showPage(pageName) {
         getProducts().then(products => showProductThumbnails(products));
 
 
+    } else if (pageName === "addCategory") {
+        pageContent.innerHTML = "<h2>Добавление новой категории</h2>";
+        // Добавьте код для обновления товара
     } else if (pageName === "updateStatus") {
         pageContent.innerHTML = "<h2>Обновление статуса оплаты</h2>";
         // Добавьте код для обновления товара

@@ -21,9 +21,23 @@ function loginUser() {
             if (data.token) {
                 // Если токен получен, сохраняем его в localStorage
                 localStorage.setItem('token', data.token);
+                localStorage.setItem('authority', data.authority);
 
-                // Перенаправляем пользователя в личный кабинет
-                window.location.href = 'user_lk.html';
+                // Перенаправляем пользователя в соответствующий личный кабинет
+                switch (data.authority) {
+                    case 'SELLER':
+                        window.location.href = 'manager_lk.html';
+                        break;
+                    case 'CLIENT':
+                        window.location.href = 'user_lk.html';
+                        break;
+                    case 'ADMIN':
+                        window.location.href = 'owner_lk.html';
+                        break;
+                    default:
+                        throw new Error('Неизвестная роль пользователя');
+                }
+
             } else {
                 // Если есть ошибка, выводим сообщение об ошибке
                 alert('Неверное имя пользователя или пароль');
