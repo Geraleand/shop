@@ -348,9 +348,102 @@ function showPage(pageName) {
         pageContent.appendChild(formElement);
     } else if (pageName === "updateStatus") {
         pageContent.innerHTML = "<h2>Обновление статуса оплаты</h2>";
-        // Добавьте код для обновления товара
+
+        // Функция для получения неоплаченных покупок из базы данных
+        function getUnpaidPurchases() {
+            return fetch('http://localhost:8080/purchase/unpaid')
+                .then(response => response.json())
+                .catch(error => {
+                    console.error('Ошибка при получении покупок:', error);
+                    throw error;
+                });
+        }
+
+        // Функция для отображения покупки и формы обновления статуса оплаты
+        function showPurchaseDetails(purchase) {
+            // Создание элемента для отображения информации о покупке
+            const purchaseDetailsElement = document.createElement('div');
+            purchaseDetailsElement.innerHTML = `
+            <p>Номер покупки: ${purchase.purchaseId}</p>
+            <p>Логин пользователя: ${purchase.username}</p>
+            <p>Статус оплаты: ${purchase.status}</p>
+        `;
+
+            // Переключатель статуса оплаты
+            const paymentStatusToggle = document.createElement('input');
+            paymentStatusToggle.type = 'checkbox';
+            paymentStatusToggle.id = `paymentStatusToggle-${purchase.purchaseId}`; // Уникальный идентификатор для каждого чекбокса
+
+            // Добавление label для стилизации и отображения текста рядом с чекбоксом
+            const paymentStatusLabel = document.createElement('label');
+            paymentStatusLabel.textContent = 'Оплата пришла';
+            paymentStatusLabel.htmlFor = `paymentStatusToggle-${purchase.purchaseId}`;
+
+            // Установка начального значения чекбокса в зависимости от статуса
+            paymentStatusToggle.checked = purchase.status === 'Оплачен';
+
+            paymentStatusToggle.addEventListener('change', () => {
+                purchase.status = paymentStatusToggle.checked ? 'Оплачен' : 'Не оплачен';
+            });
+
+            // Кнопка "Сохранить изменения"
+            const saveChangesButton = document.createElement('button');
+            saveChangesButton.textContent = 'Сохранить изменения';
+            saveChangesButton.addEventListener('click', () => {
+                // Отправка обновленного статуса на сервер
+                fetch(`http://localhost:8080/purchase/update/${purchase.purchaseId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({status: purchase.status}),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Сервер ответил:', data);
+                        alert('Изменения сохранены!');
+                    })
+                    .catch(error => {
+                        console.error('Ошибка при отправке данных на сервер:', error);
+                        alert('Произошла ошибка при сохранении изменений.');
+                    });
+            });
+
+            // Добавление элементов в страницу
+            purchaseDetailsElement.appendChild(paymentStatusLabel);
+            purchaseDetailsElement.appendChild(paymentStatusToggle);
+            purchaseDetailsElement.appendChild(saveChangesButton);
+
+            // Очистка содержимого страницы и добавление элементов
+            pageContent.innerHTML = "";
+            pageContent.appendChild(purchaseDetailsElement);
+        }
+
+        // Получение неоплаченных покупок и отображение их списка
+        getUnpaidPurchases()
+            .then(unpaidPurchases => {
+                // Создание элементов для отображения списка покупок
+                const purchasesListElement = document.createElement('div');
+                purchasesListElement.innerHTML = "<h3>Неоплаченные покупки:</h3>";
+
+                unpaidPurchases.forEach(purchase => {
+                    const purchaseItem = document.createElement('div');
+                    purchaseItem.textContent = `Покупка #${purchase.purchaseId}, Логин: ${purchase.username}`;
+
+                    // Добавление обработчика события для отображения деталей покупки
+                    purchaseItem.addEventListener('click', () => showPurchaseDetails(purchase));
+
+                    purchasesListElement.appendChild(purchaseItem);
+                });
+
+                pageContent.appendChild(purchasesListElement);
+            })
+            .catch(error => {
+                console.error('Ошибка при получении покупок:', error);
+                alert('Произошла ошибка при получении покупок.');
+            });
+        }
     }
-}
 
 function sendProductData(formData) {
     fetch('http://localhost:8080/product/add', {
