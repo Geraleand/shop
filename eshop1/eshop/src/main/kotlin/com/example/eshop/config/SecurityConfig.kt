@@ -56,7 +56,7 @@ class SecurityConfig(
                     .hasAuthority("ADMIN")
                     .requestMatchers("/products/**")
                     .hasAnyAuthority("ADMIN", "SELLER")
-                    .requestMatchers("/category/add")
+                    .requestMatchers("/category/add", "/purchase/unpaid/**")
                     .hasAuthority("SELLER")
                     .anyRequest()
                     .fullyAuthenticated()

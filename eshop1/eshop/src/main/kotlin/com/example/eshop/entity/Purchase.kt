@@ -11,7 +11,7 @@ open class Purchase {
     @Column(name = "id", nullable = false)
     open var id: Long? = null
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     open var user: User? = null
 

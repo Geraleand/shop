@@ -42,4 +42,16 @@ class PurchaseService(
         purchaseItemRepository.saveAll(purchaseItems)
         cartRepository.deleteByUser(user)
     }
+
+    fun getUnpaidPurchases(): List<Purchase> =
+        purchaseRepository.findByIsPaid(false)
+
+    fun payPurchases(ids: List<Long>) {
+        val purchases = purchaseRepository.findAllById(ids)
+        purchases.forEach {
+            it.isPaid = true
+            it.paymentDate = Instant.now()
+        }
+        purchaseRepository.saveAll(purchases)
+    }
 }

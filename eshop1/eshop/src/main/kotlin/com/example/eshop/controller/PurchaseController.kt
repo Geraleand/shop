@@ -1,9 +1,8 @@
 package com.example.eshop.controller
 
+import com.example.eshop.entity.Purchase
 import com.example.eshop.service.PurchaseService
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/purchase")
@@ -14,4 +13,13 @@ class PurchaseController(
     @PostMapping("/create")
     fun createPurchase() =
         purchaseService.createPurchase()
+
+    @GetMapping("/unpaid/list")
+    fun getUnpaidPurchases(): List<Purchase> =
+        purchaseService.getUnpaidPurchases()
+
+    @PutMapping("/unpaid/pay")
+    fun payPurchase(@RequestBody purchaseIds: List<Long>) =
+        purchaseService.payPurchases(purchaseIds)
+
 }
