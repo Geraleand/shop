@@ -50,10 +50,12 @@ class SecurityConfig(
             .csrf { it.disable() }
             .authorizeHttpRequests {
                 it
-                    .requestMatchers("/api/auth**", "/category/all")
+                    .requestMatchers("/api/auth**", "/category/all", "/products/list", "/products/one/**")
                     .permitAll()
                     .requestMatchers("/manager/**")
                     .hasAuthority("ADMIN")
+                    .requestMatchers("/products/**")
+                    .hasAnyAuthority("ADMIN", "SELLER")
                     .requestMatchers("/category/add")
                     .hasAuthority("SELLER")
                     .anyRequest()
