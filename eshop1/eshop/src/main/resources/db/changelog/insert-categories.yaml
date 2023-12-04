@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert_categories
+      author: admin
+      changes:
+        - insert:
+            tableName: categories
+            columns:
+              - column:
+                  name: name
+                  value: Футболки
+              - column:
+                  name: id
+                  value: 1
+
+        - insert:
+            tableName: categories
+            columns:
+              - column:
+                  name: name
+                  value: Шорты
+              - column:
+                  name: id
+                  value: 2
+
+        - insert:
+            tableName: categories
+            columns:
+              - column:
+                  name: name
+                  value: Кроссовки
+              - column:
+                  name: id
+                  value: 3

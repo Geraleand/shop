@@ -50,18 +50,14 @@ class SecurityConfig(
             .csrf { it.disable() }
             .authorizeHttpRequests {
                 it
-                    .requestMatchers("/loginPage**", "/loginPage/**", "/styles/css/**", "/js/**")
-                    .permitAll()
-                    .requestMatchers("/api/auth**")
+                    .requestMatchers("/api/auth**", "/category/all")
                     .permitAll()
                     .requestMatchers("/api/admin/**")
                     .hasAuthority("ADMIN")
-                    .requestMatchers("/purchase/**")
-                    .hasAuthority("ADMIN")
+                    .requestMatchers("/category/add")
+                    .hasAuthority("SELLER")
                     .anyRequest()
                     .fullyAuthenticated()
-//                    .anyRequest()
-//                    .permitAll()
             }
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

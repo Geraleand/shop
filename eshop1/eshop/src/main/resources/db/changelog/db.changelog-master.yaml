@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db\changelog\init-changelog.yaml
   - include:
       file: db\changelog\insert-data.yaml
+  - include:
+      file: db\changelog\insert-categories.yaml
