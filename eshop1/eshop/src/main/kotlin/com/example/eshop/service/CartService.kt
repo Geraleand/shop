@@ -2,6 +2,7 @@ package com.example.eshop.service
 
 import com.example.eshop.dto.CartItemDTO
 import com.example.eshop.dto.UpdateCartRequest
+import com.example.eshop.entity.Cart
 import com.example.eshop.entity.CartItem
 import com.example.eshop.repository.CartItemRepository
 import com.example.eshop.repository.CartRepository
@@ -37,7 +38,7 @@ class CartService(
             return
         }
 
-        val cart = cartRepository.findByUser_Username(username)
+        val cart = cartRepository.findByUser_Username(username).orElse(Cart())
         val user = userRepository.findByUsernameIgnoreCase(username).orElse(null)
         cart.user = user
         cartRepository.save(cart)
@@ -61,7 +62,7 @@ class CartService(
         if (cartItemRepository.existsByCart_User_Username(username))
             return
 
-        val cart = cartRepository.findByUser_Username(username)
+        val cart = cartRepository.findByUser_Username(username).orElse(null)
         cartRepository.delete(cart)
     }
 

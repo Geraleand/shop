@@ -22,7 +22,7 @@ class ProductsService(
         productRepository.findAll().map { product ->
             ProductDTO(
                 name = product.title!!,
-                photo = product.photo!!,
+                photo = product.photo,
                 availableCount =  product.count!!,
                 categoryId = product.category?.id!!,
                 categoryName = product.category?.name!!,

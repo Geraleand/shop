@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db\changelog\insert-data.yaml
   - include:
       file: db\changelog\insert-categories.yaml
+  - include:
+      file: db\changelog\insert-products.yaml

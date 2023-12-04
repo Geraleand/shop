@@ -2,7 +2,7 @@ package com.example.eshop.dto
 
 data class ProductDTO(
     val name: String,
-    val photo: ByteArray,
+    val photo: ByteArray? = null,
     val availableCount: Int,
     val categoryId: Long,
     val categoryName: String,

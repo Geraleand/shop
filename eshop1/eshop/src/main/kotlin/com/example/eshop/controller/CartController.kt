@@ -18,7 +18,7 @@ class CartController(
     fun addToCart(@RequestBody cartRequest: UpdateCartRequest, principal: Principal) =
         cartService.addToCart(cartRequest, principal.name)
 
-    @DeleteMapping("delete-item")
+    @DeleteMapping("/delete-item")
     fun deleteFromCart(@RequestBody cartRequest: UpdateCartRequest, principal: Principal) =
         cartService.deleteFromCart(cartRequest, principal.name)
 }

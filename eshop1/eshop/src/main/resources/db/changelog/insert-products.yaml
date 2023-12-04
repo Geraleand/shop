@@ -1,0 +1,70 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert_products
+      author: admin
+      changes:
+        - insert:
+            tableName: products
+            columns:
+              - column:
+                  name: title
+                  value: 'Классная футболка'
+              - column:
+                  name: article
+                  value: '515313135454'
+              - column:
+                  name: count
+                  value: 20
+              - column:
+                  name: supplier
+                  value: 'Поставщик №1'
+              - column:
+                  name: category_id
+                  value: 1
+              - column:
+                  name: price
+                  value: 200
+
+        - insert:
+            tableName: products
+            columns:
+              - column:
+                  name: title
+                  value: 'Классные шорты'
+              - column:
+                  name: article
+                  value: '1111111111111'
+              - column:
+                  name: count
+                  value: 100
+              - column:
+                  name: supplier
+                  value: 'Поставщик №2'
+              - column:
+                  name: category_id
+                  value: 2
+              - column:
+                  name: price
+                  value: 400
+
+        - insert:
+            tableName: products
+            columns:
+              - column:
+                  name: title
+                  value: 'Классные кроссовки'
+              - column:
+                  name: article
+                  value: '222222222222'
+              - column:
+                  name: count
+                  value: 10
+              - column:
+                  name: supplier
+                  value: 'Поставщик №3'
+              - column:
+                  name: category_id
+                  value: 3
+              - column:
+                  name: price
+                  value: 15000
