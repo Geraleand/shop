@@ -35,7 +35,8 @@ class AuthenticationService(
 
         return AuthenticationResponse(
             accessToken = accessToken,
-            refreshToken = refreshToken
+            refreshToken = refreshToken,
+            role = user.authorities.elementAt(0).authority
         )
     }
 
