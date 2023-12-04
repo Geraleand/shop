@@ -34,9 +34,9 @@ class AuthenticationService(
         refreshTokenRepository.save(refreshToken, user)
 
         return AuthenticationResponse(
-            accessToken = accessToken,
+            token = accessToken,
             refreshToken = refreshToken,
-            role = user.authorities.elementAt(0).authority
+            authority = user.authorities.elementAt(0).authority
         )
     }
 

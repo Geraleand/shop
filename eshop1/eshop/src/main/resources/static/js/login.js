@@ -9,7 +9,7 @@ function loginUser() {
     };
 
     // Отправляем данные на бэкенд
-    fetch('http://localhost:8080/login', {
+    fetch('http://localhost:8080/api/auth', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

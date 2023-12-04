@@ -6,12 +6,14 @@ import com.example.eshop.dto.auth.RefreshTokenRequest
 import com.example.eshop.dto.auth.RefreshTokenResponse
 import com.example.eshop.service.security.AuthenticationService
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(maxAge = 3600)
 class AuthController(
     private val authenticationService: AuthenticationService
 ) {
