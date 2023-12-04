@@ -21,8 +21,8 @@ class UserService(
     }
 
     @Transactional
-    fun addUser(userDTO: UserDTO) {
-        if (userRepository.existsByUsernameIgnoreCase(userDTO.username))
+    fun addUser(userDTO: UserDTO, newAuthority: String): UserDTO {
+        if (userRepository.existsByUsernameIgnoreCase(userDTO.username!!))
             throw Exception("user already exists")
         val user = User()
         user.username = userDTO.username
@@ -34,8 +34,53 @@ class UserService(
         val savedUser = userRepository.save(user)
         val authority = Authority()
         authority.user = savedUser
-        authority.authority = "CLIENT"
+        authority.authority = newAuthority
         authorityRepository.save(authority)
+        return mapUserToDTO(savedUser)!!
+    }
+
+    @Transactional
+    fun updateUser(userDTO: UserDTO): UserDTO {
+        val oldUser = userRepository.findById(userDTO.id!!).orElse(null)
+        if (oldUser == null)
+            throw Exception("user does not exists")
+        oldUser.email = userDTO.email
+        oldUser.phone = userDTO.phone
+        oldUser.firstName = userDTO.firstName
+        oldUser.lastName = userDTO.lastName
+        val newUser = userRepository.save(oldUser)
+        return mapUserToDTO(newUser)!!
+    }
+
+    fun getManagerList(): List<UserDTO> {
+        val authorities = authorityRepository.findByAuthority("SELLER")
+        val userList = authorities.map { it.user!! }
+        return userList.map { mapUserToDTO(it)!! }
+    }
+
+    fun getUser(id: Long): UserDTO {
+        return mapUserToDTO(userRepository.findById(id).orElse(null))!!
+    }
+
+    @Transactional
+    fun deleteUser(id: Long) {
+        val user = userRepository.findById(id).orElse(null)
+        userRepository.delete(user)
+        authorityRepository.deleteByUser(user)
+    }
+
+
+    private fun mapUserToDTO(user: User?): UserDTO? {
+        if (user == null)
+            return null
+        return UserDTO(
+            username = user.username!!,
+            lastName = user.lastName!!,
+            firstName = user.firstName!!,
+            email = user.email!!,
+            phone = user.phone!!,
+            id = user.id
+        )
     }
 
 }

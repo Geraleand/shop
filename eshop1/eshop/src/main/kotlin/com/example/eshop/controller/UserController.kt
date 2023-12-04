@@ -17,7 +17,7 @@ class UserController(
 
     @PostMapping("/sign-up")
     fun signUp(@RequestBody userDTO: UserDTO): ResponseEntity<Unit> {
-        userService.addUser(userDTO)
+        userService.addUser(userDTO, "CLIENT")
         return ResponseEntity(HttpStatus.OK)
     }
 }
