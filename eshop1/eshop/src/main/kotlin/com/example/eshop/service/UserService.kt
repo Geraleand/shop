@@ -5,6 +5,7 @@ import com.example.eshop.entity.Authority
 import com.example.eshop.entity.User
 import com.example.eshop.repository.AuthorityRepository
 import com.example.eshop.repository.UserRepository
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -67,6 +68,11 @@ class UserService(
         val user = userRepository.findById(id).orElse(null)
         userRepository.delete(user)
         authorityRepository.deleteByUser(user)
+    }
+
+    fun getUserFromContext():User {
+        val username: String = SecurityContextHolder.getContext().authentication.name
+        return userRepository.findByUsernameIgnoreCase(username).orElse(null)
     }
 
 
