@@ -52,7 +52,7 @@ class SecurityConfig(
                 it
                     .requestMatchers("/api/auth**", "/category/all", "/products/list", "/products/one/**")
                     .permitAll()
-                    .requestMatchers("/manager/**")
+                    .requestMatchers("/manager/**", "/analytics/**")
                     .hasAuthority("ADMIN")
                     .requestMatchers("/products/**")
                     .hasAnyAuthority("ADMIN", "SELLER")
