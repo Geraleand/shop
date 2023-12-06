@@ -483,9 +483,10 @@ function sendNewCategory(newCategoryName) {
     fetch('http://localhost:8080/category/add', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
         },
-        body: JSON.stringify({ name: newCategoryName })
+        body: JSON.stringify({ categoryName: newCategoryName })
     })
         .then(response => response.json())
         .then(data => {
