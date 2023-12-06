@@ -36,7 +36,7 @@ function showPage(pageName) {
         formElement.id = "addProductForm";
 
         // Получаем категории с сервера и заполняем выпадающий список
-        getCategories().then(categories => {
+        getProductCategories().then(categories => {
             var categorySelect = document.createElement("select");
             categorySelect.id = "productCategory";
             categorySelect.name = "productCategory";
@@ -44,8 +44,8 @@ function showPage(pageName) {
 
             categories.forEach(category => {
                 var option = document.createElement("option");
-                option.value = category.id; // Предполагается, что у категорий есть идентификатор
-                option.text = category.name; // Предполагается, что у категорий есть поле "name"
+                option.value = category.id.toString(); // Преобразуем в строку, чтобы соответствовать Long в ProductDTO
+                option.text = category.name;
                 categorySelect.appendChild(option);
             });
 
@@ -54,86 +54,75 @@ function showPage(pageName) {
         });
 
         formElement.innerHTML = `
-            <h2>Ввод нового товара в базу данных</h2>
-            <label for="productName">Название товара:</label>
-            <input type="text" id="productName" name="productName" required><br>
+        <h2>Ввод нового товара в базу данных</h2>
+        <label for="productName">Название товара:</label>
+        <input type="text" id="productName" name="productName" required><br>
 
-            <label for="productCode">Артикул:</label>
-            <input type="text" id="productCode" name="productCode" required><br>
+        <label for="productCode">Артикул:</label>
+        <input type="text" id="productCode" name="productCode" required><br>
 
-            <label for="productPhoto">Фото:</label>
-            <input type="file" id="productPhoto" name="productPhoto"><br>
+        <label for="productPhoto">Фото:</label>
+        <input type="file" id="productPhoto" name="productPhoto"><br>
 
-            <label for="productPrice">Цена:</label>
-            <input type="number" id="productPrice" name="productPrice" step="1" required><br>
+        <label for="productPrice">Цена:</label>
+        <input type="number" id="productPrice" name="productPrice" step="0.01" required><br>
 
-            <label for="productQuantity">Количество:</label>
-            <input type="number" id="productQuantity" name="productQuantity" step="1" required><br>
+        <label for="productQuantity">Количество:</label>
+        <input type="number" id="productQuantity" name="productQuantity" step="1" required><br>
 
-            <label for="productSupplier">Поставщик:</label>
-            <input type="text" id="productSupplier" name="productSupplier" required><br>
-            
-            <label for="productCategory">Категория:</label>
-            <input type="text" id="productCategory" name="productCategory" required><br>
+        <label for="productSupplier">Поставщик:</label>
+        <input type="text" id="productSupplier" name="productSupplier" required><br>
 
-            <button type="submit">Добавить товар</button>
-        `;
+        <button type="submit">Добавить товар</button>
+    `;
 
         // Добавляем обработчик события для формы
-            formElement.addEventListener('submit', function (event) {
-                event.preventDefault();
+        formElement.addEventListener('submit', function (event) {
+            event.preventDefault();
 
-                // Получение данных из формы
-                var productName = document.getElementById('productName').value;
-                var productCode = document.getElementById('productCode').value;
-                var productPhoto = document.getElementById('productPhoto');
-                var productPrice = document.getElementById('productPrice').value;
-                var productQuantity = document.getElementById('productQuantity').value;
-                var productSupplier = document.getElementById('productSupplier').value;
-                var productCategory = document.getElementById('productCategory').value;
+            // Получение данных из формы
+            var productName = document.getElementById('productName').value;
+            var productCode = document.getElementById('productCode').value;
+            var productPhoto = document.getElementById('productPhoto').files[0];
+            var productPrice = document.getElementById('productPrice').value;
+            var productQuantity = document.getElementById('productQuantity').value;
+            var productSupplier = document.getElementById('productSupplier').value;
+            var productCategory = document.getElementById('productCategory').value;
 
-                // Создание объекта товара
-                const formData = new FormData();
-                formData.append('title', productName);
-                formData.append('article', productCode);
-                formData.append('photo', productPhoto.files[0]); // Здесь inputElement - ваш элемент input типа file
-                formData.append('price', parseFloat(productPrice));
-                formData.append('quantity', parseInt(productQuantity));
-                formData.append('supplier', productSupplier);
-                formData.append('category', productCategory);
+            // Создание объекта товара
+            const formData = new FormData();
+            formData.append('name', productName);
+            formData.append('article', productCode);
+            formData.append('photo', productPhoto);
+            formData.append('price', parseFloat(productPrice));
+            formData.append('availableCount', parseInt(productQuantity));
+            formData.append('supplier', productSupplier);
+            formData.append('categoryId', parseInt(productCategory));
+            formData.append('categoryName', ''); // Может потребоваться в зависимости от сервера
 
-                // Отправка данных на сервер
-                sendProductData(formData);
+            // Отправка данных на сервер
+            sendProductData(formData);
 
             alert('Товар успешно добавлен!');
             this.reset();
         });
+
         pageContent.appendChild(formElement);
-
-
-
     } else if (pageName === "updateProduct") {
         pageContent.innerHTML = "<h2>Коррекция значений товара в базе данных</h2>";
         // Добавьте функцию для получения списка товаров из базы данных
         function getProducts() {
-            return Promise.resolve([
-                {
-                    name: 'Товар 1',
-                    article: '12345',
-                    photo: 'image/1.jpg',
-                    price: 100,
-                    quantity: 50,
-                    supplier: 'Поставщик 1'
-                },
-                {
-                    name: 'Товар 2',
-                    article: '67890',
-                    photo: 'image/2.jpg',
-                    price: 150,
-                    quantity: 30,
-                    supplier: 'Поставщик 2'
-                },
-            ]);
+            return fetch('http://localhost:8080/products/list')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Не удалось получить список товаров с сервера');
+                    }
+                    return response.json();
+                })
+                .catch(error => {
+                    console.error('Ошибка при получении списка товаров:', error);
+                    alert('Произошла ошибка при получении списка товаров.');
+                });
         }
 
         // Добавьте функцию для создания миниатюры товара
@@ -206,7 +195,7 @@ function showPage(pageName) {
             formElement.id = "editProductForm";
 
             // Получаем категории с сервера и заполняем выпадающий список
-            getCategories().then(categories => {
+            getProductCategories().then(categories => {
                 const categorySelect = document.createElement("select");
                 categorySelect.id = "productCategory";
                 categorySelect.name = "productCategory";
@@ -220,7 +209,7 @@ function showPage(pageName) {
                 });
 
                 // Выбираем текущую категорию товара
-                categorySelect.value = product.category;
+                categorySelect.value = product.categoryId; // Используйте атрибут categoryId или другой, который соответствует вашей модели
 
                 // Добавляем выпадающий список в форму
                 formElement.appendChild(categorySelect);
@@ -240,7 +229,7 @@ function showPage(pageName) {
     <input type="number" id="productPrice" name="productPrice" step="1" value="${product.price}" required><br>
 
     <label for="productQuantity">Количество:</label>
-    <input type="number" id="productQuantity" name="productQuantity" step="1" value="${product.quantity}" required><br>
+    <input type="number" id="productQuantity" name="productQuantity" step="1" value="${product.availableCount}" required><br>
 
     <label for="productSupplier">Поставщик:</label>
     <input type="text" id="productSupplier" name="productSupplier" value="${product.supplier}" required><br>
@@ -351,7 +340,7 @@ function showPage(pageName) {
 
         // Функция для получения неоплаченных покупок из базы данных
         function getUnpaidPurchases() {
-            return fetch('http://localhost:8080/purchase/unpaid')
+            return fetch('http://localhost:8080/purchase/unpaid/list')
                 .then(response => response.json())
                 .catch(error => {
                     console.error('Ошибка при получении покупок:', error);
@@ -366,7 +355,7 @@ function showPage(pageName) {
             purchaseDetailsElement.innerHTML = `
             <p>Номер покупки: ${purchase.purchaseId}</p>
             <p>Логин пользователя: ${purchase.username}</p>
-            <p>Статус оплаты: ${purchase.status}</p>
+            <p>Статус оплаты: ${purchase.isPaid ? 'Оплачен' : 'Не оплачен'}</p>
         `;
 
             // Переключатель статуса оплаты
@@ -382,21 +371,18 @@ function showPage(pageName) {
             // Установка начального значения чекбокса в зависимости от статуса
             paymentStatusToggle.checked = purchase.status === 'Оплачен';
 
+            // Обновленный обработчик события для чекбокса
             paymentStatusToggle.addEventListener('change', () => {
-                purchase.status = paymentStatusToggle.checked ? 'Оплачен' : 'Не оплачен';
-            });
+                purchase.isPaid = paymentStatusToggle.checked;
+                const purchaseIds = [purchase.id];
 
-            // Кнопка "Сохранить изменения"
-            const saveChangesButton = document.createElement('button');
-            saveChangesButton.textContent = 'Сохранить изменения';
-            saveChangesButton.addEventListener('click', () => {
-                // Отправка обновленного статуса на сервер
-                fetch(`http://localhost:8080/purchase/update/${purchase.purchaseId}`, {
-                    method: 'POST',
+                // Отправка списка идентификаторов на сервер для обновления статуса
+                fetch('http://localhost:8080/purchase/unpaid/pay', {
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({status: purchase.status}),
+                    body: JSON.stringify(purchaseIds),
                 })
                     .then(response => response.json())
                     .then(data => {
@@ -446,9 +432,21 @@ function showPage(pageName) {
     }
 
 function sendProductData(formData) {
-    fetch('http://localhost:8080/product/add', {
+    fetch('http://localhost:8080/products/create', {
         method: 'POST',
-        body: formData,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: formData.get('name'),
+            article: formData.get('article'),
+            photo: null, // Здесь нужно указать бинарные данные, если отправляете изображение
+            price: parseFloat(formData.get('price')),
+            availableCount: parseInt(formData.get('availableCount')),
+            supplier: formData.get('supplier'),
+            categoryId: parseInt(formData.get('categoryId')),
+            categoryName: '', // Может потребоваться в зависимости от сервера
+        })
     })
         .then(response => response.json())
         .then(data => {
@@ -465,19 +463,20 @@ function sendProductData(formData) {
         });
 }
 
-function getCategories() {
-    return fetch('http://localhost:8080/category/all') // Предполагается, что у вас есть эндпоинт для получения категорий
+function getProductCategories() {
+    return fetch('http://localhost:8080/category/all')
         .then(response => {
             if (!response.ok) {
-                throw new Error('Не удалось получить категории с сервера');
+                throw new Error('Не удалось получить список категорий с сервера');
             }
             return response.json();
         })
         .catch(error => {
-            console.error('Ошибка при получении категорий:', error);
-            alert('Произошла ошибка при получении категорий.');
+            console.error('Ошибка при получении списка категорий:', error);
+            alert('Произошла ошибка при получении списка категорий.');
         });
 }
+
 
 function sendNewCategory(newCategoryName) {
     // Отправка данных на сервер

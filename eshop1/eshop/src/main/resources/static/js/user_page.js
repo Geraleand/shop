@@ -68,8 +68,37 @@ function showPage(pageName) {
             .catch(error => console.error('Error:', error));
     } else if (pageName === "updatePassword") {
 
-    } else if (pageName === "myOrder") {
+    }
+    else if (pageName === "myOrder") {
+        fetch('http://localhost:8080/purchase/list', {
+            method: 'GET',
+            credentials: 'include' // Включаем передачу куки
+        })
+            .then(response => response.json())
+            .then(purchases => {
+                // Создаем элемент для отображения списка заказов
+                const purchasesListElement = document.createElement('div');
+                purchasesListElement.innerHTML = "<h3>Мои заказы:</h3>";
 
+                // Перебираем заказы и добавляем их в список
+                purchases.forEach(purchase => {
+                    const purchaseItem = document.createElement('div');
+                    purchaseItem.innerHTML = `
+                <p>Заказ #${purchase.id}</p>
+                <p>Дата создания: ${new Date(purchase.creationDate).toLocaleString()}</p>
+                <p>Статус оплаты: ${purchase.isPaid ? 'Оплачен' : 'Не оплачен'}</p>
+                <ul>
+                    ${purchase.items.map(item => `<li>${item.productName}, Количество: ${item.quantity}</li>`).join('')}
+                </ul>
+            `;
+
+                    purchasesListElement.appendChild(purchaseItem);
+                });
+
+                // Добавляем список заказов на страницу
+                pageContent.appendChild(purchasesListElement);
+            })
+            .catch(error => console.error('Error:', error));
     }
 }
 
