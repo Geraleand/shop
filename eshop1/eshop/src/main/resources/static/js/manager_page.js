@@ -35,6 +35,9 @@ function showPage(pageName) {
         var formElement = document.createElement("form");
         formElement.id = "addProductForm";
 
+        // Добавляем переменную для хранения id категории
+        var selectedCategoryId;
+
         // Получаем категории с сервера и заполняем выпадающий список
         getProductCategories().then(categories => {
             var categorySelect = document.createElement("select");
@@ -51,6 +54,11 @@ function showPage(pageName) {
 
             // Добавляем выпадающий список в форму
             formElement.appendChild(categorySelect);
+
+            // Сохраняем id выбранной категории при изменении значения
+            categorySelect.addEventListener('change', function () {
+                selectedCategoryId = this.value;
+            });
         });
 
         formElement.innerHTML = `
@@ -90,20 +98,17 @@ function showPage(pageName) {
             var productCategory = document.getElementById('productCategory').value;
 
             // Создание объекта товара
-            const formData = new FormData();
-            formData.append('name', productName);
-            formData.append('article', productCode);
-            formData.append('photo', productPhoto);
-            formData.append('price', parseFloat(productPrice));
-            formData.append('availableCount', parseInt(productQuantity));
-            formData.append('supplier', productSupplier);
-            formData.append('categoryId', parseInt(productCategory));
-            formData.append('categoryName', ''); // Может потребоваться в зависимости от сервера
-
-            // Отправка данных на сервер
-            sendProductData(formData);
-
-            alert('Товар успешно добавлен!');
+            const productData = {
+                name: productName,
+                photo: productPhoto,
+                availableCount: parseInt(productQuantity),
+                categoryId: selectedCategoryId,
+                categoryName: productCategory,
+                supplier: productSupplier,
+                article: productCode,
+                price: parseFloat(productPrice)
+            };
+            sendProductData(productData)
             this.reset();
         });
 
@@ -170,6 +175,9 @@ function showPage(pageName) {
             // Отправляем запрос на сервер для удаления товара по артикулу
             fetch(`http://localhost:8080/product/delete/${productId}`, {
                 method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem("token")
+                },
             })
                 .then(response => response.json())
                 .then(data => {
@@ -194,25 +202,36 @@ function showPage(pageName) {
             const formElement = document.createElement("form");
             formElement.id = "editProductForm";
 
+            // Добавляем переменную для хранения id категории
+            var selectedCategoryId;
+
             // Получаем категории с сервера и заполняем выпадающий список
             getProductCategories().then(categories => {
-                const categorySelect = document.createElement("select");
+                var categorySelect = document.createElement("select");
                 categorySelect.id = "productCategory";
                 categorySelect.name = "productCategory";
                 categorySelect.required = true;
 
                 categories.forEach(category => {
-                    const option = document.createElement("option");
-                    option.value = category.id;
+                    var option = document.createElement("option");
+                    option.value = category.id.toString(); // Преобразуем в строку, чтобы соответствовать Long в ProductDTO
                     option.text = category.name;
+
+                    // Если категория совпадает с категорией товара, устанавливаем атрибут selected
+                    if (category.id === product.categoryId) {
+                        option.selected = true;
+                    }
+
                     categorySelect.appendChild(option);
                 });
 
-                // Выбираем текущую категорию товара
-                categorySelect.value = product.categoryId; // Используйте атрибут categoryId или другой, который соответствует вашей модели
-
                 // Добавляем выпадающий список в форму
                 formElement.appendChild(categorySelect);
+
+                // Сохраняем id выбранной категории при изменении значения
+                categorySelect.addEventListener('change', function () {
+                    selectedCategoryId = this.value;
+                });
             });
 
             formElement.innerHTML = `
@@ -246,8 +265,9 @@ function showPage(pageName) {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem("token")
                     },
-                    body: JSON.stringify(productData),
+                    body: JSON.stringify(productData)
                 })
                     .then(response => response.json())
                     .then(data => {
@@ -267,14 +287,24 @@ function showPage(pageName) {
                 event.preventDefault();
 
                 // Получение данных из формы
-                var productData = {
-                    name: document.getElementById('productName').value,
-                    article: document.getElementById('productCode').value,
-                    photo: document.getElementById('productPhoto').value, // Здесь могут быть изменения
-                    price: parseFloat(document.getElementById('productPrice').value),
-                    quantity: parseInt(document.getElementById('productQuantity').value),
-                    supplier: document.getElementById('productSupplier').value,
-                    // Добавьте другие поля, если они есть
+                var productName = document.getElementById('productName').value;
+                var productCode = document.getElementById('productCode').value;
+                var productPhoto = document.getElementById('productPhoto').files[0];
+                var productPrice = document.getElementById('productPrice').value;
+                var productQuantity = document.getElementById('productQuantity').value;
+                var productSupplier = document.getElementById('productSupplier').value;
+                var productCategory = document.getElementById('productCategory').value;
+
+                // Создание объекта товара
+                const productData = {
+                    name: productName,
+                    photo: productPhoto,
+                    availableCount: parseInt(productQuantity),
+                    categoryId: selectedCategoryId,
+                    categoryName: productCategory,
+                    supplier: productSupplier,
+                    article: productCode,
+                    price: parseFloat(productPrice)
                 };
 
                 // Отправка данных на сервер
@@ -340,7 +370,12 @@ function showPage(pageName) {
 
         // Функция для получения неоплаченных покупок из базы данных
         function getUnpaidPurchases() {
-            return fetch('http://localhost:8080/purchase/unpaid/list')
+            return fetch('http://localhost:8080/purchase/unpaid/list', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem("token")
+                }
+            })
                 .then(response => response.json())
                 .catch(error => {
                     console.error('Ошибка при получении покупок:', error);
@@ -348,41 +383,61 @@ function showPage(pageName) {
                 });
         }
 
-        // Функция для отображения покупки и формы обновления статуса оплаты
+// Функция для отображения покупки и формы обновления статуса оплаты
         function showPurchaseDetails(purchase) {
             // Создание элемента для отображения информации о покупке
             const purchaseDetailsElement = document.createElement('div');
             purchaseDetailsElement.innerHTML = `
-            <p>Номер покупки: ${purchase.purchaseId}</p>
-            <p>Логин пользователя: ${purchase.username}</p>
-            <p>Статус оплаты: ${purchase.isPaid ? 'Оплачен' : 'Не оплачен'}</p>
-        `;
+        <p>Номер покупки: ${purchase.id}</p>
+        <p>Логин пользователя: ${purchase.username}</p>
+        <p>Статус оплаты: ${purchase.isPaid ? 'Оплачен' : 'Не оплачен'}</p>
+    `;
 
             // Переключатель статуса оплаты
             const paymentStatusToggle = document.createElement('input');
             paymentStatusToggle.type = 'checkbox';
-            paymentStatusToggle.id = `paymentStatusToggle-${purchase.purchaseId}`; // Уникальный идентификатор для каждого чекбокса
+            paymentStatusToggle.id = `paymentStatusToggle-${purchase.id}`; // Уникальный идентификатор для каждого чекбокса
 
             // Добавление label для стилизации и отображения текста рядом с чекбоксом
             const paymentStatusLabel = document.createElement('label');
             paymentStatusLabel.textContent = 'Оплата пришла';
-            paymentStatusLabel.htmlFor = `paymentStatusToggle-${purchase.purchaseId}`;
+            paymentStatusLabel.htmlFor = `paymentStatusToggle-${purchase.id}`;
 
             // Установка начального значения чекбокса в зависимости от статуса
-            paymentStatusToggle.checked = purchase.status === 'Оплачен';
+            paymentStatusToggle.checked = purchase.isPaid;
 
-            // Обновленный обработчик события для чекбокса
+            // Добавление элементов в страницу
+            purchaseDetailsElement.appendChild(paymentStatusLabel);
+            purchaseDetailsElement.appendChild(paymentStatusToggle);
+
+            // Очистка содержимого страницы и добавление элементов
+            pageContent.innerHTML = "";
+            pageContent.appendChild(purchaseDetailsElement);
+
+            // Локальный массив для хранения изменений статуса оплаты
+            const changesToSave = [];
+
+            // Обработчик события для чекбокса
             paymentStatusToggle.addEventListener('change', () => {
-                purchase.isPaid = paymentStatusToggle.checked;
-                const purchaseIds = [purchase.id];
+                changesToSave.push({ id: purchase.id, isPaid: paymentStatusToggle.checked });
+            });
 
-                // Отправка списка идентификаторов на сервер для обновления статуса
+            // Добавляем кнопку для сохранения изменений
+            const saveChangesButton = document.createElement('button');
+            saveChangesButton.textContent = 'Сохранить изменения';
+            saveChangesButton.addEventListener('click', () => saveChanges());
+            purchaseDetailsElement.appendChild(saveChangesButton);
+
+            // Функция для отправки изменений на сервер
+            function saveChanges() {
+                // Отправка списка покупок на сервер для обновления статуса оплаты
                 fetch('http://localhost:8080/purchase/unpaid/pay', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem("token")
                     },
-                    body: JSON.stringify(purchaseIds),
+                    body: JSON.stringify(changesToSave),
                 })
                     .then(response => response.json())
                     .then(data => {
@@ -393,19 +448,10 @@ function showPage(pageName) {
                         console.error('Ошибка при отправке данных на сервер:', error);
                         alert('Произошла ошибка при сохранении изменений.');
                     });
-            });
-
-            // Добавление элементов в страницу
-            purchaseDetailsElement.appendChild(paymentStatusLabel);
-            purchaseDetailsElement.appendChild(paymentStatusToggle);
-            purchaseDetailsElement.appendChild(saveChangesButton);
-
-            // Очистка содержимого страницы и добавление элементов
-            pageContent.innerHTML = "";
-            pageContent.appendChild(purchaseDetailsElement);
+            }
         }
 
-        // Получение неоплаченных покупок и отображение их списка
+// Получение неоплаченных покупок и отображение их списка
         getUnpaidPurchases()
             .then(unpaidPurchases => {
                 // Создание элементов для отображения списка покупок
@@ -414,7 +460,7 @@ function showPage(pageName) {
 
                 unpaidPurchases.forEach(purchase => {
                     const purchaseItem = document.createElement('div');
-                    purchaseItem.textContent = `Покупка #${purchase.purchaseId}, Логин: ${purchase.username}`;
+                    purchaseItem.textContent = `Покупка #${purchase.id}, Логин: ${purchase.username}`;
 
                     // Добавление обработчика события для отображения деталей покупки
                     purchaseItem.addEventListener('click', () => showPurchaseDetails(purchase));
@@ -428,25 +474,19 @@ function showPage(pageName) {
                 console.error('Ошибка при получении покупок:', error);
                 alert('Произошла ошибка при получении покупок.');
             });
-        }
+
+         }
     }
 
-function sendProductData(formData) {
+function sendProductData(productData) {
+
     fetch('http://localhost:8080/products/create', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
         },
-        body: JSON.stringify({
-            name: formData.get('name'),
-            article: formData.get('article'),
-            photo: null, // Здесь нужно указать бинарные данные, если отправляете изображение
-            price: parseFloat(formData.get('price')),
-            availableCount: parseInt(formData.get('availableCount')),
-            supplier: formData.get('supplier'),
-            categoryId: parseInt(formData.get('categoryId')),
-            categoryName: '', // Может потребоваться в зависимости от сервера
-        })
+        body: JSON.stringify(productData)
     })
         .then(response => response.json())
         .then(data => {
