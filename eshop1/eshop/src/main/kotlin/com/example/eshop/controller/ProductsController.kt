@@ -18,11 +18,11 @@ class ProductsController(
         productsService.getOneProduct(id)
 
     @PostMapping("/create")
-    fun createProduct(@RequestBody productDTO: ProductDTO): ProductDTO =
+    fun createProduct(@ModelAttribute productDTO: ProductDTO): ProductDTO =
         productsService.createProduct(productDTO)
 
     @PutMapping("/update")
-    fun updateProduct(@RequestBody productDTO: ProductDTO): ProductDTO =
+    fun updateProduct(@ModelAttribute productDTO: ProductDTO): ProductDTO =
         productsService.updateProduct(productDTO)
 
     @DeleteMapping("/delete/{productId}")

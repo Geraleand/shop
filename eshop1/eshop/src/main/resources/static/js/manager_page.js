@@ -36,7 +36,7 @@ function showPage(pageName) {
         formElement.id = "addProductForm";
 
         // Добавляем переменную для хранения id категории
-        var selectedCategoryId;
+        var selectedCategoryId = 1;
 
         // Получаем категории с сервера и заполняем выпадающий список
         getProductCategories().then(categories => {
@@ -136,7 +136,7 @@ function showPage(pageName) {
             thumbnail.classList.add('product-thumbnail');
 
             thumbnail.innerHTML = `
-            <img src="${product.photo}" alt="${product.name}">
+            <img src="data:image/jpeg;base64,${product.outputPhoto}" alt="${product.name}">
             <p>${product.name}</p>
             <p>Артикул: ${product.article}</p>
             <p>Цена: ${product.price}</p>
@@ -479,14 +479,22 @@ function showPage(pageName) {
     }
 
 function sendProductData(productData) {
+    var formData = new FormData()
+    formData.append("name", productData.name);
+    formData.append("photo", productData.photo);
+    formData.append("availableCount", productData.availableCount);
+    formData.append("categoryId", productData.categoryId);
+    formData.append("categoryName", productData.categoryName);
+    formData.append("supplier", productData.supplier);
+    formData.append("article", productData.article);
+    formData.append("price", productData.price)
 
     fetch('http://localhost:8080/products/create', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + localStorage.getItem("token")
         },
-        body: JSON.stringify(productData)
+        body: formData
     })
         .then(response => response.json())
         .then(data => {

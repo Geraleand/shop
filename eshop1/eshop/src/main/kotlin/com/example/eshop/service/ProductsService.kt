@@ -19,26 +19,14 @@ class ProductsService(
     }
 
     fun getProducts(): List<ProductDTO> =
-        productRepository.findAll().map { product ->
-            ProductDTO(
-                name = product.title!!,
-                photo = product.photo,
-                availableCount =  product.count!!,
-                categoryId = product.category?.id!!,
-                categoryName = product.category?.name!!,
-                id = product.id,
-                supplier = product.supplier!!,
-                article = product.article!!,
-                price = product.price!!
-            )
-    }
+        productRepository.findAll().map { mapProductToDTO(it) }
 
     fun createProduct(productDTO: ProductDTO): ProductDTO {
         val category = categoryRepository.findById(productDTO.categoryId).orElse(null)
         val product = Product()
         product.count = productDTO.availableCount
         product.category = category
-        product.photo = productDTO.photo
+        product.photo = productDTO.photo?.bytes
         product.title = productDTO.name
         product.article = productDTO.article
         product.price = productDTO.price
@@ -52,7 +40,7 @@ class ProductsService(
         val oldProduct = productRepository.findById(productDTO.id!!).orElse(null)
         oldProduct.count = productDTO.availableCount
         oldProduct.category = category
-        oldProduct.photo = productDTO.photo
+        oldProduct.photo = productDTO.photo?.bytes
         oldProduct.title = productDTO.name
         oldProduct.article = productDTO.article
         oldProduct.price = productDTO.price
@@ -69,7 +57,7 @@ class ProductsService(
         return ProductDTO(
             id = product.id,
             name = product.title!!,
-            photo = product.photo!!,
+            outputPhoto = product.photo,
             availableCount = product.count!!,
             categoryId = product.category?.id!!,
             categoryName = product.category?.name!!,
